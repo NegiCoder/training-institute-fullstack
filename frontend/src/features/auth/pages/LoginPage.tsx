@@ -61,7 +61,11 @@ export function LoginPage() {
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <label className="form-field">
           <span>Email</span>
-          <input type="email" placeholder="admin@training.com" {...register('email')} />
+          <input
+            type="email"
+            placeholder="admin@training.com"
+            {...register('email')}
+          />
           {errors.email && (
             <small className="field-error">{errors.email.message}</small>
           )}
@@ -69,7 +73,11 @@ export function LoginPage() {
 
         <label className="form-field">
           <span>Password</span>
-          <input type="password" placeholder="Admin@123" {...register('password')} />
+          <input
+            type="password"
+            placeholder="Admin@123"
+            {...register('password')}
+          />
           {errors.password && (
             <small className="field-error">{errors.password.message}</small>
           )}
@@ -77,7 +85,9 @@ export function LoginPage() {
 
         {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-        {successMessage && <div className="alert success-alert">{successMessage}</div>}
+        {successMessage && (
+          <div className="alert success-alert">{successMessage}</div>
+        )}
 
         <button className="primary-button" type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Login'}

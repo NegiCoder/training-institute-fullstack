@@ -19,7 +19,9 @@ export const enrollmentService = {
   },
 
   async getMyEnrollments(): Promise<EnrollmentResponse[]> {
-    const response = await apiClient.get<EnrollmentResponse[]>('/api/Enrollments/me')
+    const response = await apiClient.get<EnrollmentResponse[]>(
+      '/api/Enrollments/me',
+    )
     return response.data
   },
 

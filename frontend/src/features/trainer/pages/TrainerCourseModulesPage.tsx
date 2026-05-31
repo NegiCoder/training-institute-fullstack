@@ -32,10 +32,14 @@ function getContentTypeLabel(contentType: number): string {
 
 export function TrainerCourseModulesPage() {
   const user = useAuthStore((state) => state.user)
-  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>([])
+  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>(
+    [],
+  )
   const [selectedCourseId, setSelectedCourseId] = useState(0)
   const [modules, setModules] = useState<CourseContentResponse[]>([])
-  const [editingModule, setEditingModule] = useState<CourseContentResponse | null>(null)
+  const [editingModule, setEditingModule] = useState<CourseContentResponse | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -66,7 +70,9 @@ export function TrainerCourseModulesPage() {
       try {
         setIsLoading(true)
         setErrorMessage('')
-        const result = await courseTrainerService.getCoursesByTrainerId(user.userId)
+        const result = await courseTrainerService.getCoursesByTrainerId(
+          user.userId,
+        )
         const unique = Array.from(
           new Map(result.map((row) => [row.courseId, row])).values(),
         )
@@ -173,15 +179,16 @@ export function TrainerCourseModulesPage() {
       <p className="eyebrow">Trainer</p>
       <h1>Course Modules</h1>
       <p className="page-text">
-        Upload and manage the videos, PDFs, and links for the courses assigned to you.
+        Upload and manage the videos, PDFs, and links for the courses assigned to
+        you.
       </p>
 
       {isLoading && <p className="page-text">Loading your courses...</p>}
 
       {!isLoading && assignedCourses.length === 0 && (
         <div className="empty-state">
-          No courses are assigned to you yet. Ask an admin to assign you to a course
-          first.
+          No courses are assigned to you yet. Ask an admin to assign you to a
+          course first.
         </div>
       )}
 
@@ -232,7 +239,10 @@ export function TrainerCourseModulesPage() {
 
           <label className="form-field">
             <span>Sort order</span>
-            <input type="number" {...register('sortOrder', { valueAsNumber: true })} />
+            <input
+              type="number"
+              {...register('sortOrder', { valueAsNumber: true })}
+            />
             {errors.sortOrder && (
               <small className="field-error">{errors.sortOrder.message}</small>
             )}
@@ -248,7 +258,11 @@ export function TrainerCourseModulesPage() {
               {editingModule ? 'Update module' : 'Create module'}
             </button>
             {editingModule && (
-              <button className="secondary-button" type="button" onClick={cancelEdit}>
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={cancelEdit}
+              >
                 Cancel
               </button>
             )}
@@ -257,7 +271,9 @@ export function TrainerCourseModulesPage() {
       )}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
-      {successMessage && <div className="alert success-alert">{successMessage}</div>}
+      {successMessage && (
+        <div className="alert success-alert">{successMessage}</div>
+      )}
 
       {!isLoading && assignedCourses.length > 0 && selectedCourseId > 0 && (
         <div className="admin-table-wrap">

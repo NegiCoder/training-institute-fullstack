@@ -16,7 +16,9 @@ export const courseTrainerService = {
     return response.data
   },
 
-  async assignTrainer(request: AssignTrainerRequest): Promise<CourseTrainerResponse> {
+  async assignTrainer(
+    request: AssignTrainerRequest,
+  ): Promise<CourseTrainerResponse> {
     const response = await apiClient.post<CourseTrainerResponse>(
       '/api/CourseTrainers',
       request,

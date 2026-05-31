@@ -72,7 +72,11 @@ export function RegisterPage() {
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <label className="form-field">
           <span>Full name</span>
-          <input type="text" placeholder="Jane Student" {...register('fullName')} />
+          <input
+            type="text"
+            placeholder="Jane Student"
+            {...register('fullName')}
+          />
           {errors.fullName && (
             <small className="field-error">{errors.fullName.message}</small>
           )}
@@ -92,7 +96,11 @@ export function RegisterPage() {
 
         <label className="form-field">
           <span>Password</span>
-          <input type="password" placeholder="Student@123" {...register('password')} />
+          <input
+            type="password"
+            placeholder="Student@123"
+            {...register('password')}
+          />
           {errors.password && (
             <small className="field-error">{errors.password.message}</small>
           )}
@@ -106,7 +114,9 @@ export function RegisterPage() {
             {...register('confirmPassword')}
           />
           {errors.confirmPassword && (
-            <small className="field-error">{errors.confirmPassword.message}</small>
+            <small className="field-error">
+              {errors.confirmPassword.message}
+            </small>
           )}
         </label>
 

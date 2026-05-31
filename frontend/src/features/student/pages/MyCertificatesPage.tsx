@@ -66,12 +66,18 @@ export function MyCertificatesPage() {
       {!isLoading && !errorMessage && certificates.length > 0 && (
         <div className="certificate-grid">
           {certificates.map((certificate) => (
-            <article className="certificate-card" key={certificate.certificateIssuedId}>
+            <article
+              className="certificate-card"
+              key={certificate.certificateIssuedId}
+            >
               <div>
                 <span className="status-label">Certificate</span>
                 <h2>{certificate.courseTitle}</h2>
                 <p>{certificate.certificateNumber}</p>
-                <p>Issued on {new Date(certificate.issuedAt).toLocaleDateString()}</p>
+                <p>
+                  Issued on{' '}
+                  {new Date(certificate.issuedAt).toLocaleDateString()}
+                </p>
               </div>
 
               <button

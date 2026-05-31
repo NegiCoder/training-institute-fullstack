@@ -96,7 +96,9 @@ export function AdminCreateAdminPage() {
           <span>Confirm password</span>
           <input type="password" {...register('confirmPassword')} />
           {errors.confirmPassword && (
-            <small className="field-error">{errors.confirmPassword.message}</small>
+            <small className="field-error">
+              {errors.confirmPassword.message}
+            </small>
           )}
         </label>
 
@@ -104,7 +106,8 @@ export function AdminCreateAdminPage() {
 
         {createdAdmin && (
           <div className="alert success-alert">
-            Admin created. User ID: {createdAdmin.userId}. Email: {createdAdmin.email}
+            Admin created. User ID: {createdAdmin.userId}. Email:{' '}
+            {createdAdmin.email}
           </div>
         )}
 

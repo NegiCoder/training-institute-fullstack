@@ -13,7 +13,9 @@ export const courseService = {
     return response.data
   },
 
-  async search(request: CourseSearchRequest): Promise<PagedResponse<CourseResponse>> {
+  async search(
+    request: CourseSearchRequest,
+  ): Promise<PagedResponse<CourseResponse>> {
     const response = await apiClient.get<PagedResponse<CourseResponse>>(
       '/api/Courses/search',
       {

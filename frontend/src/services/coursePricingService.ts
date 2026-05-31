@@ -20,7 +20,9 @@ export const coursePricingService = {
     return response.data
   },
 
-  async create(request: CreateCoursePricingRequest): Promise<CoursePricingResponse> {
+  async create(
+    request: CreateCoursePricingRequest,
+  ): Promise<CoursePricingResponse> {
     const response = await apiClient.post<CoursePricingResponse>(
       '/api/CoursePricings',
       request,

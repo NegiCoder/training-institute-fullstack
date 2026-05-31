@@ -8,7 +8,9 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 export function TrainerDashboardPage() {
   const user = useAuthStore((state) => state.user)
-  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>([])
+  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>(
+    [],
+  )
   const [enrollments, setEnrollments] = useState<EnrollmentResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')

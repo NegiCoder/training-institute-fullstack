@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { enrollmentService } from '@/services/enrollmentService'
-import { EnrollmentStatus, type EnrollmentResponse, type PagedResponse } from '@/types'
+import {
+  EnrollmentStatus,
+  type EnrollmentResponse,
+  type PagedResponse,
+} from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 function getEnrollmentStatusLabel(status: number): string {
@@ -50,7 +54,10 @@ export function AdminEnrollmentsPage() {
     void loadEnrollments()
   }
 
-  async function handleStatusChange(courseEnrollmentId: number, nextStatus: number) {
+  async function handleStatusChange(
+    courseEnrollmentId: number,
+    nextStatus: number,
+  ) {
     try {
       setUpdatingId(courseEnrollmentId)
       setErrorMessage('')
@@ -71,7 +78,9 @@ export function AdminEnrollmentsPage() {
     <section className="page-card">
       <p className="eyebrow">Admin</p>
       <h1>Enrollments</h1>
-      <p className="page-text">Search enrollments and update student course status.</p>
+      <p className="page-text">
+        Search enrollments and update student course status.
+      </p>
 
       <div className="filter-grid">
         <input
@@ -135,7 +144,9 @@ export function AdminEnrollmentsPage() {
                         }
                       >
                         <option value={EnrollmentStatus.Assigned}>Assigned</option>
-                        <option value={EnrollmentStatus.InProgress}>In Progress</option>
+                        <option value={EnrollmentStatus.InProgress}>
+                          In Progress
+                        </option>
                         <option value={EnrollmentStatus.Completed}>Completed</option>
                         <option value={EnrollmentStatus.Cancelled}>Cancelled</option>
                       </select>

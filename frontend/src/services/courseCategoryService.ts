@@ -7,9 +7,8 @@ import type {
 
 export const courseCategoryService = {
   async getAll(): Promise<CourseCategoryResponse[]> {
-    const response = await apiClient.get<CourseCategoryResponse[]>(
-      '/api/CourseCategories',
-    )
+    const response =
+      await apiClient.get<CourseCategoryResponse[]>('/api/CourseCategories')
     return response.data
   },
 
@@ -20,7 +19,9 @@ export const courseCategoryService = {
     return response.data
   },
 
-  async create(request: CreateCourseCategoryRequest): Promise<CourseCategoryResponse> {
+  async create(
+    request: CreateCourseCategoryRequest,
+  ): Promise<CourseCategoryResponse> {
     const response = await apiClient.post<CourseCategoryResponse>(
       '/api/CourseCategories',
       request,

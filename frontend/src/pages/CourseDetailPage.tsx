@@ -120,7 +120,9 @@ export function CourseDetailPage() {
       <section className="page-card narrow-card">
         <p className="eyebrow">Course</p>
         <h1>Unable to load course</h1>
-        <div className="alert error-alert">{errorMessage || 'Course not found.'}</div>
+        <div className="alert error-alert">
+          {errorMessage || 'Course not found.'}
+        </div>
         <Link className="primary-link" to="/courses">
           Back to courses
         </Link>
@@ -136,7 +138,9 @@ export function CourseDetailPage() {
 
       <p className="eyebrow">{course.categoryName}</p>
       <h1>{course.title}</h1>
-      <p className="page-text">{course.description ?? 'No description available.'}</p>
+      <p className="page-text">
+        {course.description ?? 'No description available.'}
+      </p>
 
       <div className="course-meta detail-meta">
         <span>{course.level}</span>
@@ -157,11 +161,15 @@ export function CourseDetailPage() {
             {isEnrolling ? 'Enrolling...' : 'Enroll in this course'}
           </button>
         ) : (
-          <p className="page-text">Login as a student to enroll in this course.</p>
+          <p className="page-text">
+            Login as a student to enroll in this course.
+          </p>
         )}
       </div>
 
-      {successMessage && <div className="alert success-alert">{successMessage}</div>}
+      {successMessage && (
+        <div className="alert success-alert">{successMessage}</div>
+      )}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 

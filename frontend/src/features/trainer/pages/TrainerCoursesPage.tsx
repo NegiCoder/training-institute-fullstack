@@ -7,7 +7,9 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 export function TrainerCoursesPage() {
   const user = useAuthStore((state) => state.user)
-  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>([])
+  const [assignedCourses, setAssignedCourses] = useState<CourseTrainerResponse[]>(
+    [],
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -37,7 +39,9 @@ export function TrainerCoursesPage() {
     <section className="page-card">
       <p className="eyebrow">Trainer</p>
       <h1>My Assigned Courses</h1>
-      <p className="page-text">View courses assigned to your trainer account.</p>
+      <p className="page-text">
+        View courses assigned to your trainer account.
+      </p>
 
       {isLoading && <p className="page-text">Loading assigned courses...</p>}
 
@@ -56,7 +60,10 @@ export function TrainerCoursesPage() {
                 <strong>#{assignment.courseId}</strong>
               </div>
               <h2>{assignment.courseTitle}</h2>
-              <p>Assigned on {new Date(assignment.assignedAt).toLocaleDateString()}</p>
+              <p>
+                Assigned on{' '}
+                {new Date(assignment.assignedAt).toLocaleDateString()}
+              </p>
               <Link className="course-link" to={`/courses/${assignment.courseId}`}>
                 View public details
               </Link>

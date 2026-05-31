@@ -7,7 +7,9 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 export function CourseCatalogPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [pageNumber, setPageNumber] = useState(1)
-  const [courses, setCourses] = useState<PagedResponse<CourseResponse> | null>(null)
+  const [courses, setCourses] = useState<PagedResponse<CourseResponse> | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -43,7 +45,9 @@ export function CourseCatalogPage() {
     <section className="page-card">
       <p className="eyebrow">Courses</p>
       <h1>Course Catalog</h1>
-      <p className="page-text">Browse published courses from your backend API.</p>
+      <p className="page-text">
+        Browse published courses from your backend API.
+      </p>
 
       <div className="catalog-toolbar">
         <input

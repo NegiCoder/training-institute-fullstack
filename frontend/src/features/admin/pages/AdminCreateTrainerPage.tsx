@@ -64,8 +64,8 @@ export function AdminCreateTrainerPage() {
       <p className="eyebrow">Admin</p>
       <h1>Create Trainer</h1>
       <p className="page-text">
-        Create a trainer user account, then use the returned user id to assign the
-        trainer to a course.
+        Create a trainer user account, then use the returned user id to assign
+        the trainer to a course.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
@@ -97,7 +97,9 @@ export function AdminCreateTrainerPage() {
           <span>Confirm password</span>
           <input type="password" {...register('confirmPassword')} />
           {errors.confirmPassword && (
-            <small className="field-error">{errors.confirmPassword.message}</small>
+            <small className="field-error">
+              {errors.confirmPassword.message}
+            </small>
           )}
         </label>
 
