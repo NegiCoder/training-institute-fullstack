@@ -24,6 +24,7 @@ WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:8080
 
 COPY --from=build /app/publish ./
+RUN mkdir -p /app/wwwroot/certificates
 
 EXPOSE 8080
 

@@ -79,6 +79,7 @@ public class CertificateService : ICertificateService
 
         var fileName = $"{certificateNumber}.pdf";
         var fullPath = Path.Combine(_storageSettings.Folder, fileName);
+        Directory.CreateDirectory(_storageSettings.Folder);
         await File.WriteAllBytesAsync(fullPath, pdfBytes);
 
         var publicPath = $"{_storageSettings.PublicBaseUrl.TrimEnd('/')}/{fileName}";

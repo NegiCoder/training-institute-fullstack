@@ -148,8 +148,15 @@ update_enrollment_status() {
 
 issue_certificate() {
   local enrollmentId="$1"; local token="$2"
-  post "$API/api/Certificates/issue" \
-"{\"courseEnrollmentId\":$enrollmentId}" "$token" >/dev/null || true
+  local resp http
+  resp=$(curl -s -w "\n__HTTP__:%{http_code}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $token" \
+    -X POST "$API/api/Certificates/issue" \
+    -d "{\"courseEnrollmentId\":$enrollmentId}")
+  http=$(echo "$resp" | sed -n 's/^__HTTP__://p')
+
+  [[ "$http" -ge 200 && "$http" -lt 300 ]]
 }
 
 create_profile() {
@@ -467,8 +474,11 @@ hdr "Step 8: Issuing certificates for first 10 completed enrollments"
 COUNT=0
 for EID in "${COMPLETED_ENROLLMENT_IDS[@]}"; do
   [[ $COUNT -ge 10 ]] && break
-  issue_certificate "$EID" "$ADMIN_TOKEN"
-  COUNT=$((COUNT + 1))
+  if issue_certificate "$EID" "$ADMIN_TOKEN"; then
+    COUNT=$((COUNT + 1))
+  else
+    warn "Certificate issue failed for enrollment $EID; continuing"
+  fi
 done
 ok "Certificates issued: $COUNT"
 
