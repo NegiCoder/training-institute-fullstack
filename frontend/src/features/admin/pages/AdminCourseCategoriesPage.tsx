@@ -15,8 +15,9 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 
 export function AdminCourseCategoriesPage() {
   const [categories, setCategories] = useState<CourseCategoryResponse[]>([])
-  const [editingCategory, setEditingCategory] =
-    useState<CourseCategoryResponse | null>(null)
+  const [editingCategory, setEditingCategory] = useState<CourseCategoryResponse | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -117,9 +118,7 @@ export function AdminCourseCategoriesPage() {
         <label className="form-field">
           <span>Category name</span>
           <input type="text" placeholder="Programming" {...register('name')} />
-          {errors.name && (
-            <small className="field-error">{errors.name.message}</small>
-          )}
+          {errors.name && <small className="field-error">{errors.name.message}</small>}
         </label>
 
         {editingCategory && (
@@ -135,11 +134,7 @@ export function AdminCourseCategoriesPage() {
           </button>
 
           {editingCategory && (
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={cancelEdit}
-            >
+            <button className="secondary-button" type="button" onClick={cancelEdit}>
               Cancel
             </button>
           )}
@@ -148,9 +143,7 @@ export function AdminCourseCategoriesPage() {
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-      {successMessage && (
-        <div className="alert success-alert">{successMessage}</div>
-      )}
+      {successMessage && <div className="alert success-alert">{successMessage}</div>}
 
       {isLoading && <p className="page-text">Loading categories...</p>}
 

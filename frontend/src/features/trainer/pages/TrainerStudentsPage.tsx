@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { enrollmentService } from '@/services/enrollmentService'
-import {
-  EnrollmentStatus,
-  type EnrollmentResponse,
-} from '@/types'
+import { EnrollmentStatus, type EnrollmentResponse } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 function statusLabel(status: EnrollmentStatus): string {
@@ -58,8 +55,7 @@ export function TrainerStudentsPage() {
       <p className="eyebrow">Trainer</p>
       <h1>My Students</h1>
       <p className="page-text">
-        Students enrolled in the courses assigned to you, with their current
-        progress.
+        Students enrolled in the courses assigned to you, with their current progress.
       </p>
 
       {isLoading && <p className="page-text">Loading enrollments...</p>}
@@ -87,9 +83,8 @@ export function TrainerStudentsPage() {
               <span>Completed</span>
               <strong>
                 {
-                  enrollments.filter(
-                    (e) => e.status === EnrollmentStatus.Completed,
-                  ).length
+                  enrollments.filter((e) => e.status === EnrollmentStatus.Completed)
+                    .length
                 }
               </strong>
             </div>
@@ -97,9 +92,8 @@ export function TrainerStudentsPage() {
               <span>In Progress</span>
               <strong>
                 {
-                  enrollments.filter(
-                    (e) => e.status === EnrollmentStatus.InProgress,
-                  ).length
+                  enrollments.filter((e) => e.status === EnrollmentStatus.InProgress)
+                    .length
                 }
               </strong>
             </div>

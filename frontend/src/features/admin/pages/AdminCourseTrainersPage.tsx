@@ -113,9 +113,7 @@ export function AdminCourseTrainersPage() {
     <section className="page-card">
       <p className="eyebrow">Admin</p>
       <h1>Course Trainers</h1>
-      <p className="page-text">
-        Assign trainers to courses using the trainer user id.
-      </p>
+      <p className="page-text">Assign trainers to courses using the trainer user id.</p>
 
       {isLoading && <p className="page-text">Loading courses...</p>}
 

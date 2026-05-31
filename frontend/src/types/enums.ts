@@ -21,8 +21,7 @@ export const EnrollmentStatus = {
   Cancelled: 4,
 } as const
 
-export type EnrollmentStatus =
-  (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
+export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
 
 export const ContentType = {
   Video: 1,

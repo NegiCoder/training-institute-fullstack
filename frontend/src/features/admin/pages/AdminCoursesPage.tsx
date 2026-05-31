@@ -4,11 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { courseCategoryService } from '@/services/courseCategoryService'
 import { courseService } from '@/services/courseService'
-import {
-  CourseStatus,
-  type CourseCategoryResponse,
-  type CourseResponse,
-} from '@/types'
+import { CourseStatus, type CourseCategoryResponse, type CourseResponse } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 const courseSchema = z.object({
@@ -24,6 +20,19 @@ const courseSchema = z.object({
 })
 
 type CourseFormValues = z.infer<typeof courseSchema>
+
+const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced']
+const MODE_OPTIONS = ['Online', 'Hybrid']
+
+type CourseFilters = {
+  searchTerm: string
+  categoryId: string
+  status: string
+  level: string
+  mode: string
+  featured: string
+  openAccess: string
+}
 
 function getStatusLabel(status: number): string {
   if (status === CourseStatus.Draft) {
@@ -46,6 +55,12 @@ export function AdminCoursesPage() {
   const [categories, setCategories] = useState<CourseCategoryResponse[]>([])
   const [editingCourse, setEditingCourse] = useState<CourseResponse | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterCategoryId, setFilterCategoryId] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [filterLevel, setFilterLevel] = useState('')
+  const [filterMode, setFilterMode] = useState('')
+  const [filterFeatured, setFilterFeatured] = useState('')
+  const [filterOpenAccess, setFilterOpenAccess] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -70,23 +85,44 @@ export function AdminCoursesPage() {
     },
   })
 
-  async function loadData() {
+  async function loadData(filterOverride?: CourseFilters) {
+    const activeFilters = filterOverride ?? {
+      searchTerm,
+      categoryId: filterCategoryId,
+      status: filterStatus,
+      level: filterLevel,
+      mode: filterMode,
+      featured: filterFeatured,
+      openAccess: filterOpenAccess,
+    }
+
     try {
       setIsLoading(true)
       setErrorMessage('')
 
       const [categoriesResult, coursesResult] = await Promise.all([
         courseCategoryService.getAll(),
-        searchTerm.trim()
-          ? courseService.search({
-              searchTerm: searchTerm.trim(),
-              pageNumber: 1,
-              pageSize: 50,
-            })
-          : courseService.search({
-              pageNumber: 1,
-              pageSize: 50,
-            }),
+        courseService.search({
+          searchTerm: activeFilters.searchTerm.trim() || undefined,
+          courseCategoryId: activeFilters.categoryId
+            ? Number(activeFilters.categoryId)
+            : undefined,
+          status: activeFilters.status
+            ? (Number(activeFilters.status) as CourseStatus)
+            : undefined,
+          level: activeFilters.level || undefined,
+          mode: activeFilters.mode || undefined,
+          isFeatured:
+            activeFilters.featured === ''
+              ? undefined
+              : activeFilters.featured === 'true',
+          isOpenAccess:
+            activeFilters.openAccess === ''
+              ? undefined
+              : activeFilters.openAccess === 'true',
+          pageNumber: 1,
+          pageSize: 50,
+        }),
       ])
 
       setCategories(categoriesResult.filter((category) => category.isActive))
@@ -177,13 +213,36 @@ export function AdminCoursesPage() {
     }
   }
 
+  function resetFilters() {
+    setSearchTerm('')
+    setFilterCategoryId('')
+    setFilterStatus('')
+    setFilterLevel('')
+    setFilterMode('')
+    setFilterFeatured('')
+    setFilterOpenAccess('')
+  }
+
+  async function clearFilters() {
+    const emptyFilters = {
+      searchTerm: '',
+      categoryId: '',
+      status: '',
+      level: '',
+      mode: '',
+      featured: '',
+      openAccess: '',
+    }
+
+    resetFilters()
+    await loadData(emptyFilters)
+  }
+
   return (
     <section className="page-card">
       <p className="eyebrow">Admin</p>
       <h1>Courses</h1>
-      <p className="page-text">
-        Create, publish, feature, search, and manage courses.
-      </p>
+      <p className="page-text">Create, publish, feature, search, and manage courses.</p>
 
       <div className="catalog-toolbar">
         <input
@@ -192,8 +251,93 @@ export function AdminCoursesPage() {
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
         />
-        <button className="secondary-button" type="button" onClick={loadData}>
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => void loadData()}
+        >
           Search
+        </button>
+      </div>
+
+      <div className="filter-grid">
+        <select
+          value={filterCategoryId}
+          onChange={(event) => setFilterCategoryId(event.target.value)}
+        >
+          <option value="">All categories</option>
+          {categories.map((category) => (
+            <option key={category.courseCategoryId} value={category.courseCategoryId}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filterStatus}
+          onChange={(event) => setFilterStatus(event.target.value)}
+        >
+          <option value="">Draft + published</option>
+          <option value={CourseStatus.Draft}>Draft</option>
+          <option value={CourseStatus.Published}>Published</option>
+        </select>
+
+        <select
+          value={filterLevel}
+          onChange={(event) => setFilterLevel(event.target.value)}
+        >
+          <option value="">All levels</option>
+          {LEVEL_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filterMode}
+          onChange={(event) => setFilterMode(event.target.value)}
+        >
+          <option value="">All modes</option>
+          {MODE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filterFeatured}
+          onChange={(event) => setFilterFeatured(event.target.value)}
+        >
+          <option value="">Featured + regular</option>
+          <option value="true">Featured only</option>
+          <option value="false">Regular only</option>
+        </select>
+
+        <select
+          value={filterOpenAccess}
+          onChange={(event) => setFilterOpenAccess(event.target.value)}
+        >
+          <option value="">Free + paid</option>
+          <option value="true">Open access only</option>
+          <option value="false">Paid only</option>
+        </select>
+
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => void loadData()}
+        >
+          Apply filters
+        </button>
+
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => void clearFilters()}
+        >
+          Clear filters
         </button>
       </div>
 
@@ -203,18 +347,13 @@ export function AdminCoursesPage() {
           <select {...register('courseCategoryId', { valueAsNumber: true })}>
             <option value={0}>Select category</option>
             {categories.map((category) => (
-              <option
-                key={category.courseCategoryId}
-                value={category.courseCategoryId}
-              >
+              <option key={category.courseCategoryId} value={category.courseCategoryId}>
                 {category.name}
               </option>
             ))}
           </select>
           {errors.courseCategoryId && (
-            <small className="field-error">
-              {errors.courseCategoryId.message}
-            </small>
+            <small className="field-error">{errors.courseCategoryId.message}</small>
           )}
         </label>
 
@@ -237,9 +376,7 @@ export function AdminCoursesPage() {
         <label className="form-field">
           <span>Mode</span>
           <input type="text" {...register('mode')} />
-          {errors.mode && (
-            <small className="field-error">{errors.mode.message}</small>
-          )}
+          {errors.mode && <small className="field-error">{errors.mode.message}</small>}
         </label>
 
         <label className="form-field">
@@ -279,11 +416,7 @@ export function AdminCoursesPage() {
             {editingCourse ? 'Update course' : 'Create course'}
           </button>
           {editingCourse && (
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={cancelEdit}
-            >
+            <button className="secondary-button" type="button" onClick={cancelEdit}>
               Cancel
             </button>
           )}
@@ -292,9 +425,7 @@ export function AdminCoursesPage() {
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-      {successMessage && (
-        <div className="alert success-alert">{successMessage}</div>
-      )}
+      {successMessage && <div className="alert success-alert">{successMessage}</div>}
 
       {isLoading && <p className="page-text">Loading courses...</p>}
 

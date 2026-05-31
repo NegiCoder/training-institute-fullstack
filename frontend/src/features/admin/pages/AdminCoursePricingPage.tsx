@@ -9,7 +9,11 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 const pricingSchema = z.object({
   courseId: z.number().min(1, 'Select a course'),
-  year: z.number().int().min(2000, 'Enter a valid year').max(2100, 'Enter a valid year'),
+  year: z
+    .number()
+    .int()
+    .min(2000, 'Enter a valid year')
+    .max(2100, 'Enter a valid year'),
   price: z.number().min(0, 'Price cannot be negative'),
   isFree: z.boolean(),
   effectiveFrom: z.string().optional(),
@@ -22,7 +26,9 @@ export function AdminCoursePricingPage() {
   const [courses, setCourses] = useState<CourseResponse[]>([])
   const [selectedCourseId, setSelectedCourseId] = useState(0)
   const [pricingRows, setPricingRows] = useState<CoursePricingResponse[]>([])
-  const [editingPricing, setEditingPricing] = useState<CoursePricingResponse | null>(null)
+  const [editingPricing, setEditingPricing] = useState<CoursePricingResponse | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -195,9 +201,7 @@ export function AdminCoursePricingPage() {
         <label className="form-field">
           <span>Year</span>
           <input type="number" {...register('year', { valueAsNumber: true })} />
-          {errors.year && (
-            <small className="field-error">{errors.year.message}</small>
-          )}
+          {errors.year && <small className="field-error">{errors.year.message}</small>}
         </label>
 
         <label className="form-field">
@@ -264,10 +268,18 @@ export function AdminCoursePricingPage() {
                 <td>{row.isFree ? 'Yes' : 'No'}</td>
                 <td>
                   <div className="table-actions">
-                    <button className="secondary-button" type="button" onClick={() => startEdit(row)}>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => startEdit(row)}
+                    >
                       Edit
                     </button>
-                    <button className="danger-button" type="button" onClick={() => handleDelete(row.coursePricingId)}>
+                    <button
+                      className="danger-button"
+                      type="button"
+                      onClick={() => handleDelete(row.coursePricingId)}
+                    >
                       Delete
                     </button>
                   </div>

@@ -16,9 +16,7 @@ export function EnrollmentProgressPage() {
 
   const [enrollment, setEnrollment] = useState<EnrollmentResponse | null>(null)
   const [modules, setModules] = useState<CourseContentResponse[]>([])
-  const [progressRows, setProgressRows] = useState<
-    StudentModuleProgressResponse[]
-  >([])
+  const [progressRows, setProgressRows] = useState<StudentModuleProgressResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [savingModuleId, setSavingModuleId] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
@@ -29,7 +27,8 @@ export function EnrollmentProgressPage() {
     [progressRows],
   )
 
-  const progressPercentage = progressRows[0]?.progressPercentage ?? enrollment?.progressPercentage ?? 0
+  const progressPercentage =
+    progressRows[0]?.progressPercentage ?? enrollment?.progressPercentage ?? 0
 
   async function loadProgress() {
     if (!parsedEnrollmentId) {
@@ -105,25 +104,18 @@ export function EnrollmentProgressPage() {
 
       <p className="eyebrow">Progress</p>
       <h1>{enrollment?.courseTitle ?? 'Course Progress'}</h1>
-      <p className="page-text">
-        Complete modules to update your course progress.
-      </p>
+      <p className="page-text">Complete modules to update your course progress.</p>
 
       <div className="progress-summary">
         <strong>{progressPercentage}% complete</strong>
         <div className="progress-track">
-          <div
-            className="progress-fill"
-            style={{ width: `${progressPercentage}%` }}
-          />
+          <div className="progress-fill" style={{ width: `${progressPercentage}%` }} />
         </div>
       </div>
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-      {successMessage && (
-        <div className="alert success-alert">{successMessage}</div>
-      )}
+      {successMessage && <div className="alert success-alert">{successMessage}</div>}
 
       {modules.length === 0 && !errorMessage && (
         <div className="empty-state">No modules found for this course.</div>

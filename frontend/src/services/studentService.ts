@@ -19,8 +19,7 @@ export const studentService = {
   },
 
   async getMyProfile(): Promise<StudentProfileResponse> {
-    const response =
-      await apiClient.get<StudentProfileResponse>('/api/students/me')
+    const response = await apiClient.get<StudentProfileResponse>('/api/students/me')
     return response.data
   },
 

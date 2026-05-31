@@ -1,17 +1,46 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { courseCategoryService } from '@/services/courseCategoryService'
 import { courseService } from '@/services/courseService'
-import { CourseStatus, type CourseResponse, type PagedResponse } from '@/types'
+import {
+  CourseStatus,
+  type CourseCategoryResponse,
+  type CourseResponse,
+  type PagedResponse,
+} from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
+
+const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced']
+const MODE_OPTIONS = ['Online', 'Hybrid']
 
 export function CourseCatalogPage() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [categoryId, setCategoryId] = useState('')
+  const [level, setLevel] = useState('')
+  const [mode, setMode] = useState('')
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
+  const [showOpenAccessOnly, setShowOpenAccessOnly] = useState(false)
   const [pageNumber, setPageNumber] = useState(1)
-  const [courses, setCourses] = useState<PagedResponse<CourseResponse> | null>(
-    null,
-  )
+  const [categories, setCategories] = useState<CourseCategoryResponse[]>([])
+  const [courses, setCourses] = useState<PagedResponse<CourseResponse> | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isCategoryLoading, setIsCategoryLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const result = await courseCategoryService.getAll()
+        setCategories(result.filter((category) => category.isActive))
+      } catch (error) {
+        setErrorMessage(getApiErrorMessage(error))
+      } finally {
+        setIsCategoryLoading(false)
+      }
+    }
+
+    void loadCategories()
+  }, [])
 
   useEffect(() => {
     async function loadCourses() {
@@ -21,7 +50,12 @@ export function CourseCatalogPage() {
       try {
         const result = await courseService.search({
           searchTerm: searchTerm.trim() || undefined,
+          courseCategoryId: categoryId ? Number(categoryId) : undefined,
+          level: level || undefined,
+          mode: mode || undefined,
           status: CourseStatus.Published,
+          isFeatured: showFeaturedOnly ? true : undefined,
+          isOpenAccess: showOpenAccessOnly ? true : undefined,
           pageNumber,
           pageSize: 6,
         })
@@ -34,10 +68,28 @@ export function CourseCatalogPage() {
     }
 
     void loadCourses()
-  }, [pageNumber, searchTerm])
+  }, [
+    categoryId,
+    level,
+    mode,
+    pageNumber,
+    searchTerm,
+    showFeaturedOnly,
+    showOpenAccessOnly,
+  ])
 
   function handleSearchChange(value: string) {
     setSearchTerm(value)
+    setPageNumber(1)
+  }
+
+  function resetFilters() {
+    setSearchTerm('')
+    setCategoryId('')
+    setLevel('')
+    setMode('')
+    setShowFeaturedOnly(false)
+    setShowOpenAccessOnly(false)
     setPageNumber(1)
   }
 
@@ -45,9 +97,7 @@ export function CourseCatalogPage() {
     <section className="page-card">
       <p className="eyebrow">Courses</p>
       <h1>Course Catalog</h1>
-      <p className="page-text">
-        Browse published courses from your backend API.
-      </p>
+      <p className="page-text">Browse published courses from your backend API.</p>
 
       <div className="catalog-toolbar">
         <input
@@ -56,6 +106,82 @@ export function CourseCatalogPage() {
           value={searchTerm}
           onChange={(event) => handleSearchChange(event.target.value)}
         />
+      </div>
+
+      <div className="filter-grid">
+        <select
+          value={categoryId}
+          onChange={(event) => {
+            setCategoryId(event.target.value)
+            setPageNumber(1)
+          }}
+          disabled={isCategoryLoading}
+        >
+          <option value="">All categories</option>
+          {categories.map((category) => (
+            <option key={category.courseCategoryId} value={category.courseCategoryId}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={level}
+          onChange={(event) => {
+            setLevel(event.target.value)
+            setPageNumber(1)
+          }}
+        >
+          <option value="">All levels</option>
+          {LEVEL_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={mode}
+          onChange={(event) => {
+            setMode(event.target.value)
+            setPageNumber(1)
+          }}
+        >
+          <option value="">All modes</option>
+          {MODE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <label className="checkbox-field">
+          <input
+            type="checkbox"
+            checked={showFeaturedOnly}
+            onChange={(event) => {
+              setShowFeaturedOnly(event.target.checked)
+              setPageNumber(1)
+            }}
+          />
+          <span>Featured only</span>
+        </label>
+
+        <label className="checkbox-field">
+          <input
+            type="checkbox"
+            checked={showOpenAccessOnly}
+            onChange={(event) => {
+              setShowOpenAccessOnly(event.target.checked)
+              setPageNumber(1)
+            }}
+          />
+          <span>Open access only</span>
+        </label>
+
+        <button className="secondary-button" type="button" onClick={resetFilters}>
+          Clear filters
+        </button>
       </div>
 
       {isLoading && <p className="page-text">Loading courses...</p>}
