@@ -22,9 +22,11 @@ public class CourseResponse
 
     public CourseStatus Status { get; set; }
 
-    public bool IsOpenAccess { get; set; }
-
     public bool IsFeatured { get; set; }
+
+    public bool IsFree { get; set; }
+
+    public decimal? CurrentPrice { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

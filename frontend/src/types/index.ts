@@ -4,7 +4,12 @@ export type {
   PagedResponse,
   ValidationErrorResponse,
 } from '@/types/common'
-export type { AuthResponse, LoginRequest, RegisterRequest } from '@/types/auth'
+export type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  TrainerListItem,
+} from '@/types/auth'
 export type {
   CertificateResponse,
   CertificateSearchRequest,

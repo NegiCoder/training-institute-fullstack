@@ -3,12 +3,20 @@ import { Link, useParams } from 'react-router-dom'
 import { courseContentService } from '@/services/courseContentService'
 import { enrollmentService } from '@/services/enrollmentService'
 import { progressService } from '@/services/progressService'
-import type {
-  CourseContentResponse,
-  EnrollmentResponse,
-  StudentModuleProgressResponse,
+import {
+  type CourseContentResponse,
+  ContentType,
+  type EnrollmentResponse,
+  type StudentModuleProgressResponse,
 } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
+
+function getContentTypeLabel(contentType: number): string {
+  if (contentType === ContentType.Video) return 'Video'
+  if (contentType === ContentType.Pdf) return 'PDF'
+  if (contentType === ContentType.Link) return 'Link'
+  return 'Content'
+}
 
 export function EnrollmentProgressPage() {
   const { courseEnrollmentId } = useParams()
@@ -130,20 +138,35 @@ export function EnrollmentProgressPage() {
               <article className="module-progress-card" key={module.courseContentId}>
                 <div>
                   <strong>{module.moduleName}</strong>
-                  <span>{isCompleted ? 'Completed' : 'Pending'}</span>
+                  <span>
+                    {getContentTypeLabel(module.contentType)} ·{' '}
+                    {isCompleted ? 'Completed' : 'Pending'}
+                  </span>
                 </div>
-                <button
-                  className={isCompleted ? 'secondary-button' : 'primary-button'}
-                  type="button"
-                  disabled={isCompleted || savingModuleId === module.courseContentId}
-                  onClick={() => handleMarkComplete(module.courseContentId)}
-                >
-                  {isCompleted
-                    ? 'Completed'
-                    : savingModuleId === module.courseContentId
-                      ? 'Saving...'
-                      : 'Mark complete'}
-                </button>
+                <div className="module-progress-actions">
+                  {module.urlOrPath && (
+                    <a
+                      className="secondary-button"
+                      href={module.urlOrPath}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open
+                    </a>
+                  )}
+                  <button
+                    className={isCompleted ? 'secondary-button' : 'primary-button'}
+                    type="button"
+                    disabled={isCompleted || savingModuleId === module.courseContentId}
+                    onClick={() => handleMarkComplete(module.courseContentId)}
+                  >
+                    {isCompleted
+                      ? 'Completed'
+                      : savingModuleId === module.courseContentId
+                        ? 'Saving...'
+                        : 'Mark complete'}
+                  </button>
+                </div>
               </article>
             )
           })}

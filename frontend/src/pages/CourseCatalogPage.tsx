@@ -13,13 +13,24 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced']
 const MODE_OPTIONS = ['Online', 'Hybrid']
 
+function getPriceLabel(course: CourseResponse): string {
+  if (course.isFree) {
+    return 'Free'
+  }
+
+  if (course.currentPrice != null) {
+    return `₹${course.currentPrice}`
+  }
+
+  return 'Paid'
+}
+
 export function CourseCatalogPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [level, setLevel] = useState('')
   const [mode, setMode] = useState('')
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
-  const [showOpenAccessOnly, setShowOpenAccessOnly] = useState(false)
+  const [priceFilter, setPriceFilter] = useState('')
   const [pageNumber, setPageNumber] = useState(1)
   const [categories, setCategories] = useState<CourseCategoryResponse[]>([])
   const [courses, setCourses] = useState<PagedResponse<CourseResponse> | null>(null)
@@ -54,8 +65,8 @@ export function CourseCatalogPage() {
           level: level || undefined,
           mode: mode || undefined,
           status: CourseStatus.Published,
-          isFeatured: showFeaturedOnly ? true : undefined,
-          isOpenAccess: showOpenAccessOnly ? true : undefined,
+          isFree:
+            priceFilter === 'free' ? true : priceFilter === 'paid' ? false : undefined,
           pageNumber,
           pageSize: 6,
         })
@@ -68,15 +79,7 @@ export function CourseCatalogPage() {
     }
 
     void loadCourses()
-  }, [
-    categoryId,
-    level,
-    mode,
-    pageNumber,
-    searchTerm,
-    showFeaturedOnly,
-    showOpenAccessOnly,
-  ])
+  }, [categoryId, level, mode, pageNumber, searchTerm, priceFilter])
 
   function handleSearchChange(value: string) {
     setSearchTerm(value)
@@ -88,8 +91,7 @@ export function CourseCatalogPage() {
     setCategoryId('')
     setLevel('')
     setMode('')
-    setShowFeaturedOnly(false)
-    setShowOpenAccessOnly(false)
+    setPriceFilter('')
     setPageNumber(1)
   }
 
@@ -155,29 +157,17 @@ export function CourseCatalogPage() {
           ))}
         </select>
 
-        <label className="checkbox-field">
-          <input
-            type="checkbox"
-            checked={showFeaturedOnly}
-            onChange={(event) => {
-              setShowFeaturedOnly(event.target.checked)
-              setPageNumber(1)
-            }}
-          />
-          <span>Featured only</span>
-        </label>
-
-        <label className="checkbox-field">
-          <input
-            type="checkbox"
-            checked={showOpenAccessOnly}
-            onChange={(event) => {
-              setShowOpenAccessOnly(event.target.checked)
-              setPageNumber(1)
-            }}
-          />
-          <span>Open access only</span>
-        </label>
+        <select
+          value={priceFilter}
+          onChange={(event) => {
+            setPriceFilter(event.target.value)
+            setPageNumber(1)
+          }}
+        >
+          <option value="">All prices</option>
+          <option value="free">Free only</option>
+          <option value="paid">Paid only</option>
+        </select>
 
         <button className="secondary-button" type="button" onClick={resetFilters}>
           Clear filters
@@ -199,7 +189,7 @@ export function CourseCatalogPage() {
               <article className="course-card" key={course.courseId}>
                 <div className="course-card-header">
                   <span>{course.categoryName}</span>
-                  {course.isFeatured && <strong>Featured</strong>}
+                  <strong>{getPriceLabel(course)}</strong>
                 </div>
                 <h2>{course.title}</h2>
                 <p>{course.description ?? 'No description available.'}</p>

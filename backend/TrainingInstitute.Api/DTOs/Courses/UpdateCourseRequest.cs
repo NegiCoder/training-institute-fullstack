@@ -18,7 +18,5 @@ public class UpdateCourseRequest
 
     public CourseStatus Status { get; set; }
 
-    public bool IsOpenAccess { get; set; }
-
     public bool IsFeatured { get; set; }
 }

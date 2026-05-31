@@ -16,18 +16,36 @@ public class CourseContentService : ICourseContentService
     }
 
 
-    public async Task<List<CourseContentResponse>> GetAllModuleByCourseIdAsync(int courseId)
+    public async Task<List<CourseContentResponse>> GetAllModuleByCourseIdAsync(
+        int courseId,
+        int? userId = null,
+        bool isAdmin = false,
+        bool isTrainer = false)
     {
+        var course = await _dbcontext.Courses
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+        if (course == null)
+        {
+            return new List<CourseContentResponse>();
+        }
+
+        var canAccessUrl = await CanAccessCourseUrlAsync(course, userId, isAdmin, isTrainer);
+
         var content = await _dbcontext.CourseContents
         .Include(c => c.Course)
         .Where(c => c.CourseId == courseId && c.IsActive)
         .OrderBy(c => c.SortOrder)
         .ToListAsync();
 
-        return content.Select(MapToResponse).ToList();
+        return content.Select(c => MapToResponse(c, canAccessUrl)).ToList();
     }
 
-    public async Task<CourseContentResponse?> GetModuleByIdAsync(int courseContentId)
+    public async Task<CourseContentResponse?> GetModuleByIdAsync(
+        int courseContentId,
+        int? userId = null,
+        bool isAdmin = false,
+        bool isTrainer = false)
     {
         var content = await _dbcontext.CourseContents
         .Include(c => c.Course)
@@ -39,7 +57,47 @@ public class CourseContentService : ICourseContentService
             return null;
         }
 
-        return MapToResponse(content);
+        var canAccessUrl = content.Course != null &&
+            await CanAccessCourseUrlAsync(content.Course, userId, isAdmin, isTrainer);
+
+        return MapToResponse(content, canAccessUrl);
+    }
+
+    private async Task<bool> CanAccessCourseUrlAsync(
+        Course course,
+        int? userId,
+        bool isAdmin,
+        bool isTrainer)
+    {
+        if (isAdmin)
+        {
+            return true;
+        }
+
+        if (!userId.HasValue)
+        {
+            return false;
+        }
+
+        if (isTrainer)
+        {
+            return await _dbcontext.CourseTrainers
+                .AnyAsync(ct => ct.CourseId == course.CourseId && ct.TrainerId == userId.Value);
+        }
+
+        var student = await _dbcontext.Students
+            .FirstOrDefaultAsync(s => s.UserId == userId.Value);
+
+        if (student == null)
+        {
+            return false;
+        }
+
+        return await _dbcontext.CourseEnrollments
+            .AnyAsync(e =>
+                e.CourseId == course.CourseId &&
+                e.StudentId == student.StudentId &&
+                e.Status != EnrollmentStatus.Cancelled);
     }
 
 
@@ -141,7 +199,7 @@ public class CourseContentService : ICourseContentService
         return true;
     }
     
-    private static CourseContentResponse MapToResponse(CourseContent content)
+    private static CourseContentResponse MapToResponse(CourseContent content, bool includeUrl = true)
     {
         return new CourseContentResponse
         {
@@ -150,7 +208,7 @@ public class CourseContentService : ICourseContentService
             CourseTitle = content.Course?.Title ?? string.Empty,
             ModuleName = content.ModuleName,
             ContentType = content.ContentType,
-            UrlOrPath = content.UrlOrPath,
+            UrlOrPath = includeUrl ? content.UrlOrPath : string.Empty,
             SortOrder = content.SortOrder,
             IsActive = content.IsActive,
             CreatedAt = content.CreatedAt,

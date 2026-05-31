@@ -1,5 +1,10 @@
 import { apiClient } from '@/services/apiClient'
-import type { AuthResponse, LoginRequest, RegisterRequest } from '@/types'
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  TrainerListItem,
+} from '@/types'
 
 export const authService = {
   async login(request: LoginRequest): Promise<AuthResponse> {
@@ -25,6 +30,11 @@ export const authService = {
       '/api/auth/admin/create-admin',
       request,
     )
+    return response.data
+  },
+
+  async getTrainers(): Promise<TrainerListItem[]> {
+    const response = await apiClient.get<TrainerListItem[]>('/api/auth/trainers')
     return response.data
   },
 }

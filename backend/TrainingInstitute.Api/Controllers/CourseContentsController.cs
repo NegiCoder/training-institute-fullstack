@@ -20,14 +20,22 @@ public class CourseContentsController : ControllerBase
     [HttpGet("course/{courseId}")]
     public async Task<IActionResult> GetAllModuleByCourseId(int courseId)
     {
-        var modules = await _courseContentService.GetAllModuleByCourseIdAsync(courseId);
+        var modules = await _courseContentService.GetAllModuleByCourseIdAsync(
+            courseId,
+            GetCurrentUserId(),
+            User.IsInRole("Admin"),
+            User.IsInRole("Trainer"));
         return Ok(modules);
     }
 
     [HttpGet("{courseContentId}")]
     public async Task<IActionResult> GetModuleById(int courseContentId)
     {
-        var module = await _courseContentService.GetModuleByIdAsync(courseContentId);
+        var module = await _courseContentService.GetModuleByIdAsync(
+            courseContentId,
+            GetCurrentUserId(),
+            User.IsInRole("Admin"),
+            User.IsInRole("Trainer"));
 
         if (module == null)
         {

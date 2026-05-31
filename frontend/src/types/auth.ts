@@ -19,3 +19,9 @@ export type AuthResponse = {
   role: string
   token: string
 }
+
+export type TrainerListItem = {
+  userId: number
+  fullName: string
+  email: string
+}

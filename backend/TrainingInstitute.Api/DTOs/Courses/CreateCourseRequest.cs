@@ -18,7 +18,5 @@ public class CreateCourseRequest
 
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
 
-    public bool IsOpenAccess { get; set; }
-
     public bool IsFeatured { get; set; }
 }

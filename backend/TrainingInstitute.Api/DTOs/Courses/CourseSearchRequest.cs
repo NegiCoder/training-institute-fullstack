@@ -14,9 +14,9 @@ public class CourseSearchRequest
 
     public CourseStatus? Status { get; set; }
 
-    public bool? IsOpenAccess { get; set; }
-
     public bool? IsFeatured { get; set; }
+
+    public bool? IsFree { get; set; }
 
     public int PageNumber { get; set; } = 1;
 

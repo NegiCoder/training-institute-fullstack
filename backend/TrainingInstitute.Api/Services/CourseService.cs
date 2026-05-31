@@ -16,33 +16,44 @@ public class CourseService : ICourseService
         _context = context;
     }
 
-    public async Task<List<CourseResponse>> GetAllAsync()
+    public async Task<List<CourseResponse>> GetAllAsync(bool includeDrafts = false)
     {
-        var courses = await _context.Courses
+        var query = _context.Courses
             .Include(c => c.Category)
-            .Where(c => c.Status != CourseStatus.Archived)
-            .ToListAsync();
+            .AsQueryable();
 
-        return courses.Select(MapToResponse).ToList();
+        query = includeDrafts
+            ? query.Where(c => c.Status != CourseStatus.Archived)
+            : query.Where(c => c.Status == CourseStatus.Published);
+
+        var courses = await query.ToListAsync();
+        var pricingMap = await GetLatestPricingMapAsync(courses.Select(c => c.CourseId));
+
+        return courses.Select(c => MapToResponse(c, pricingMap.GetValueOrDefault(c.CourseId))).ToList();
     }
 
-    public async Task<CourseResponse?> GetByIdAsync(int courseId)
+    public async Task<CourseResponse?> GetByIdAsync(int courseId, bool includeDrafts = false)
     {
-        var course = await _context.Courses
+        var query = _context.Courses
             .Include(c => c.Category)
-            .FirstOrDefaultAsync(c =>
-                c.CourseId == courseId &&
-                c.Status != CourseStatus.Archived);
+            .Where(c => c.CourseId == courseId);
+
+        query = includeDrafts
+            ? query.Where(c => c.Status != CourseStatus.Archived)
+            : query.Where(c => c.Status == CourseStatus.Published);
+
+        var course = await query.FirstOrDefaultAsync();
 
         if (course == null)
         {
             return null;
         }
 
-        return MapToResponse(course);
+        var pricingMap = await GetLatestPricingMapAsync(new[] { course.CourseId });
+        return MapToResponse(course, pricingMap.GetValueOrDefault(course.CourseId));
     }
 
-    public async Task<PagedResponse<CourseResponse>> SearchAsync(CourseSearchRequest request)
+    public async Task<PagedResponse<CourseResponse>> SearchAsync(CourseSearchRequest request, bool includeDrafts = false)
     {
         var pageNumber = request.PageNumber < 1 ? 1 : request.PageNumber;
         var pageSize = request.PageSize < 1 ? 10 : request.PageSize;
@@ -56,7 +67,23 @@ public class CourseService : ICourseService
             .Include(c => c.Category)
             .AsQueryable();
 
-        query = query.Where(c => c.Status != CourseStatus.Archived);
+        if (includeDrafts)
+        {
+            query = query.Where(c => c.Status != CourseStatus.Archived);
+        }
+        else
+        {
+            // Public/student callers only see Published courses.
+            // If the caller explicitly asked for a non-Published status, treat it as no result.
+            if (request.Status.HasValue && request.Status.Value != CourseStatus.Published)
+            {
+                query = query.Where(c => false);
+            }
+            else
+            {
+                query = query.Where(c => c.Status == CourseStatus.Published);
+            }
+        }
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
@@ -88,14 +115,31 @@ public class CourseService : ICourseService
             query = query.Where(c => c.Status == request.Status.Value);
         }
 
-        if (request.IsOpenAccess.HasValue)
-        {
-            query = query.Where(c => c.IsOpenAccess == request.IsOpenAccess.Value);
-        }
-
         if (request.IsFeatured.HasValue)
         {
             query = query.Where(c => c.IsFeatured == request.IsFeatured.Value);
+        }
+
+        if (request.IsFree.HasValue)
+        {
+            var latestPricingQuery = _context.CoursePricings
+                .GroupBy(p => p.CourseId)
+                .Select(g => new
+                {
+                    CourseId = g.Key,
+                    IsFree = g.OrderByDescending(p => p.Year).First().IsFree
+                });
+
+            if (request.IsFree.Value)
+            {
+                query = query.Where(c =>
+                    latestPricingQuery.Any(p => p.CourseId == c.CourseId && p.IsFree));
+            }
+            else
+            {
+                query = query.Where(c =>
+                    !latestPricingQuery.Any(p => p.CourseId == c.CourseId && p.IsFree));
+            }
         }
 
         var totalCount = await query.CountAsync();
@@ -108,9 +152,11 @@ public class CourseService : ICourseService
             .Take(pageSize)
             .ToListAsync();
 
+        var pricingMap = await GetLatestPricingMapAsync(courses.Select(c => c.CourseId));
+
         return new PagedResponse<CourseResponse>
         {
-            Items = courses.Select(MapToResponse).ToList(),
+            Items = courses.Select(c => MapToResponse(c, pricingMap.GetValueOrDefault(c.CourseId))).ToList(),
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalCount = totalCount,
@@ -139,7 +185,6 @@ public class CourseService : ICourseService
             Mode = request.Mode,
             Duration = request.Duration,
             Status = request.Status,
-            IsOpenAccess = request.IsOpenAccess,
             IsFeatured = request.IsFeatured,
             FeaturedByUserId = request.IsFeatured ? userId : null,
             CreatedAt = DateTime.UtcNow,
@@ -153,7 +198,8 @@ public class CourseService : ICourseService
             .Include(c => c.Category)
             .FirstAsync(c => c.CourseId == course.CourseId);
 
-        return MapToResponse(createdCourse);
+        var pricingMap = await GetLatestPricingMapAsync(new[] { createdCourse.CourseId });
+        return MapToResponse(createdCourse, pricingMap.GetValueOrDefault(createdCourse.CourseId));
     }
 
     public async Task<CourseResponse?> UpdateAsync(int courseId, int userId, UpdateCourseRequest request)
@@ -182,7 +228,6 @@ public class CourseService : ICourseService
         course.Mode = request.Mode;
         course.Duration = request.Duration;
         course.Status = request.Status;
-        course.IsOpenAccess = request.IsOpenAccess;
         course.IsFeatured = request.IsFeatured;
         course.FeaturedByUserId = request.IsFeatured ? userId : null;
         course.UpdatedAt = DateTime.UtcNow;
@@ -194,7 +239,8 @@ public class CourseService : ICourseService
             .Include(c => c.Category)
             .FirstAsync(c => c.CourseId == courseId);
 
-        return MapToResponse(updatedCourse);
+        var pricingMap = await GetLatestPricingMapAsync(new[] { updatedCourse.CourseId });
+        return MapToResponse(updatedCourse, pricingMap.GetValueOrDefault(updatedCourse.CourseId));
     }
 
     public async Task<bool> DeleteAsync(int courseId, int userId)
@@ -216,7 +262,35 @@ public class CourseService : ICourseService
         return true;
     }
 
-    private static CourseResponse MapToResponse(Course course)
+    private async Task<Dictionary<int, CoursePricingSnapshot>> GetLatestPricingMapAsync(
+        IEnumerable<int> courseIds)
+    {
+        var ids = courseIds.Distinct().ToList();
+
+        if (ids.Count == 0)
+        {
+            return new Dictionary<int, CoursePricingSnapshot>();
+        }
+
+        var pricingRows = await _context.CoursePricings
+            .Where(p => ids.Contains(p.CourseId))
+            .OrderByDescending(p => p.Year)
+            .ToListAsync();
+
+        return pricingRows
+            .GroupBy(p => p.CourseId)
+            .ToDictionary(
+                g => g.Key,
+                g =>
+                {
+                    var latest = g.First();
+                    return new CoursePricingSnapshot(latest.IsFree, latest.Price);
+                });
+    }
+
+    private static CourseResponse MapToResponse(
+        Course course,
+        CoursePricingSnapshot? pricing = null)
     {
         return new CourseResponse
         {
@@ -229,10 +303,13 @@ public class CourseService : ICourseService
             Mode = course.Mode,
             Duration = course.Duration,
             Status = course.Status,
-            IsOpenAccess = course.IsOpenAccess,
             IsFeatured = course.IsFeatured,
+            IsFree = pricing?.IsFree ?? false,
+            CurrentPrice = pricing?.Price,
             CreatedAt = course.CreatedAt,
             UpdatedAt = course.UpdatedAt
         };
     }
+
+    private sealed record CoursePricingSnapshot(bool IsFree, decimal Price);
 }

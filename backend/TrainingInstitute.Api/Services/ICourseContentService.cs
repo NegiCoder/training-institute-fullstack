@@ -4,9 +4,17 @@ namespace TrainingInstitute.Api.Services;
 
 public interface ICourseContentService
 {
-    Task<List<CourseContentResponse>> GetAllModuleByCourseIdAsync(int courseId);
+    Task<List<CourseContentResponse>> GetAllModuleByCourseIdAsync(
+        int courseId,
+        int? userId = null,
+        bool isAdmin = false,
+        bool isTrainer = false);
 
-    Task<CourseContentResponse?> GetModuleByIdAsync(int courseContentId);
+    Task<CourseContentResponse?> GetModuleByIdAsync(
+        int courseContentId,
+        int? userId = null,
+        bool isAdmin = false,
+        bool isTrainer = false);
 
     Task<CourseContentResponse> CreateModuleAsync(int userId, CreateCourseContentRequest request);
 

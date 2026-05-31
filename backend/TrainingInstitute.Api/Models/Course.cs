@@ -26,9 +26,6 @@ public class Course
 
     public CourseStatus Status { get; set; }
 
-    // true matlab bina enroll kiye bhi content dikh sakta hai
-    public bool IsOpenAccess { get; set; }
-
     public bool IsFeatured { get; set; }
 
     // kis admin ne featured ka button daba - optional

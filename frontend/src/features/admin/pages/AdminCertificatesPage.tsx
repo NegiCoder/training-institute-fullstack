@@ -3,9 +3,12 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { certificateService } from '@/services/certificateService'
+import { enrollmentService } from '@/services/enrollmentService'
 import {
   CertificateEmailStatus,
   type CertificateResponse,
+  type EnrollmentResponse,
+  EnrollmentStatus,
   type PagedResponse,
 } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
@@ -29,7 +32,11 @@ export function AdminCertificatesPage() {
   const [pageNumber, setPageNumber] = useState(1)
   const [certificates, setCertificates] =
     useState<PagedResponse<CertificateResponse> | null>(null)
+  const [completedEnrollments, setCompletedEnrollments] = useState<
+    EnrollmentResponse[]
+  >([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingEnrollments, setIsLoadingEnrollments] = useState(false)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -66,10 +73,30 @@ export function AdminCertificatesPage() {
     }
   }
 
+  async function loadCompletedEnrollments() {
+    try {
+      setIsLoadingEnrollments(true)
+      const result = await enrollmentService.searchEnrollments({
+        status: EnrollmentStatus.Completed,
+        pageNumber: 1,
+        pageSize: 50,
+      })
+      setCompletedEnrollments(result.items)
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error))
+    } finally {
+      setIsLoadingEnrollments(false)
+    }
+  }
+
   useEffect(() => {
     void loadCertificates()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber])
+
+  useEffect(() => {
+    void loadCompletedEnrollments()
+  }, [])
 
   function handleSearch() {
     setPageNumber(1)
@@ -83,7 +110,7 @@ export function AdminCertificatesPage() {
       await certificateService.issueCertificate(values)
       setSuccessMessage('Certificate issued successfully.')
       reset({ courseEnrollmentId: 0 })
-      await loadCertificates()
+      await Promise.all([loadCertificates(), loadCompletedEnrollments()])
     } catch (error) {
       setErrorMessage(getApiErrorMessage(error))
     }
@@ -119,11 +146,28 @@ export function AdminCertificatesPage() {
 
       <form className="admin-form" onSubmit={handleSubmit(onSubmit)}>
         <label className="form-field">
-          <span>Course enrollment id</span>
-          <input
-            type="number"
+          <span>Completed enrollment</span>
+          <select
             {...register('courseEnrollmentId', { valueAsNumber: true })}
-          />
+            disabled={isLoadingEnrollments}
+          >
+            <option value={0}>
+              {isLoadingEnrollments
+                ? 'Loading enrollments...'
+                : completedEnrollments.length === 0
+                  ? 'No completed enrollments'
+                  : 'Select a completed enrollment'}
+            </option>
+            {completedEnrollments.map((enrollment) => (
+              <option
+                key={enrollment.courseEnrollmentId}
+                value={enrollment.courseEnrollmentId}
+              >
+                {enrollment.studentName} - {enrollment.courseTitle} (#
+                {enrollment.courseEnrollmentId})
+              </option>
+            ))}
+          </select>
           {errors.courseEnrollmentId && (
             <small className="field-error">{errors.courseEnrollmentId.message}</small>
           )}

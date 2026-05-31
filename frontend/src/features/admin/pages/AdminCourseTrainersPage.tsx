@@ -2,20 +2,22 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { authService } from '@/services/authService'
 import { courseService } from '@/services/courseService'
 import { courseTrainerService } from '@/services/courseTrainerService'
-import type { CourseResponse, CourseTrainerResponse } from '@/types'
+import type { CourseResponse, CourseTrainerResponse, TrainerListItem } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 const assignTrainerSchema = z.object({
   courseId: z.number().min(1, 'Select a course'),
-  trainerId: z.number().min(1, 'Enter a trainer user id'),
+  trainerId: z.number().min(1, 'Select a trainer'),
 })
 
 type AssignTrainerFormValues = z.infer<typeof assignTrainerSchema>
 
 export function AdminCourseTrainersPage() {
   const [courses, setCourses] = useState<CourseResponse[]>([])
+  const [trainerOptions, setTrainerOptions] = useState<TrainerListItem[]>([])
   const [selectedCourseId, setSelectedCourseId] = useState(0)
   const [trainers, setTrainers] = useState<CourseTrainerResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -40,6 +42,11 @@ export function AdminCourseTrainersPage() {
     setCourses(result.items)
   }
 
+  async function loadTrainerOptions() {
+    const result = await authService.getTrainers()
+    setTrainerOptions(result)
+  }
+
   async function loadTrainers(courseId: number) {
     if (!courseId) {
       setTrainers([])
@@ -55,7 +62,7 @@ export function AdminCourseTrainersPage() {
       try {
         setIsLoading(true)
         setErrorMessage('')
-        await loadCourses()
+        await Promise.all([loadCourses(), loadTrainerOptions()])
       } catch (error) {
         setErrorMessage(getApiErrorMessage(error))
       } finally {
@@ -113,7 +120,10 @@ export function AdminCourseTrainersPage() {
     <section className="page-card">
       <p className="eyebrow">Admin</p>
       <h1>Course Trainers</h1>
-      <p className="page-text">Assign trainers to courses using the trainer user id.</p>
+      <p className="page-text">
+        Assign trainers to courses. Pick a course, then choose a trainer from the
+        dropdown.
+      </p>
 
       {isLoading && <p className="page-text">Loading courses...</p>}
 
@@ -137,8 +147,15 @@ export function AdminCourseTrainersPage() {
         </label>
 
         <label className="form-field">
-          <span>Trainer user id</span>
-          <input type="number" {...register('trainerId', { valueAsNumber: true })} />
+          <span>Trainer</span>
+          <select {...register('trainerId', { valueAsNumber: true })}>
+            <option value={0}>Select trainer</option>
+            {trainerOptions.map((trainer) => (
+              <option key={trainer.userId} value={trainer.userId}>
+                {trainer.fullName} ({trainer.email})
+              </option>
+            ))}
+          </select>
           {errors.trainerId && (
             <small className="field-error">{errors.trainerId.message}</small>
           )}

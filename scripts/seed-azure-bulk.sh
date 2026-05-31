@@ -4,11 +4,14 @@
 # =============================================================================
 # What it does:
 #   - 1 admin (must already exist + be promoted to Role=3 in DB)
-#   - 10 trainers (created via admin)
+#   - 12 trainers (created via admin)
 #   - 100 students (registered + full profiles)
 #   - 8 categories
-#   - 30 courses with pricing, modules and trainer assignments
-#   - ~200 enrollments distributed across students
+#   - 60 courses with pricing, modules and trainer assignments
+#       * every course has a 2026 pricing row (~30% Free, rest Paid)
+#       * many courses also have a 2025 historical pricing row
+#       * a few Draft courses for testing draft visibility
+#   - ~300 enrollments distributed across students
 #   - Module progress for many enrollments
 #   - Status lifecycle moves and a handful of certificates
 #
@@ -27,7 +30,7 @@ set -euo pipefail
 
 API="${API:-http://localhost:5045}"
 
-NUM_TRAINERS=10
+NUM_TRAINERS=12
 NUM_STUDENTS=100
 
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@training.local}"
@@ -98,10 +101,10 @@ create_category() {
 create_course() {
   local catId="$1"; local title="$2"; local desc="$3"
   local level="$4"; local mode="$5"; local duration="$6"
-  local status="$7"; local openAccess="$8"; local featured="$9"
-  local token="${10}"
+  local status="$7"; local featured="$8"
+  local token="$9"
   post "$API/api/Courses" \
-"{\"courseCategoryId\":$catId,\"title\":\"$title\",\"description\":\"$desc\",\"level\":\"$level\",\"mode\":\"$mode\",\"duration\":\"$duration\",\"status\":$status,\"isOpenAccess\":$openAccess,\"isFeatured\":$featured}" \
+"{\"courseCategoryId\":$catId,\"title\":\"$title\",\"description\":\"$desc\",\"level\":\"$level\",\"mode\":\"$mode\",\"duration\":\"$duration\",\"status\":$status,\"isFeatured\":$featured}" \
     "$token" | jq -r '.courseId'
 }
 
@@ -198,8 +201,8 @@ COLLEGES=("PICT" "VJTI" "RVCE" "JNTU" "DTU" "NIT Trichy" "IIT Delhi" \
 
 PASSOUT_YEARS=(2022 2023 2024 2025 2026)
 
-TRAINER_FIRST=(Aman Priya Rahul Kavita Vikram Neha Suresh Anjali Deepak Pooja)
-TRAINER_LAST=(Sharma Iyer Mehta Khanna Singh Verma Reddy Nair Joshi Gupta)
+TRAINER_FIRST=(Aman Priya Rahul Kavita Vikram Neha Suresh Anjali Deepak Pooja Manish Divya)
+TRAINER_LAST=(Sharma Iyer Mehta Khanna Singh Verma Reddy Nair Joshi Gupta Pant Saxena)
 
 # ---------- step 0: sanity check --------------------------------------------
 
@@ -273,52 +276,80 @@ CAT_SEC=$(create_category    "Cybersecurity"    "$ADMIN_TOKEN")
 CAT_DB=$(create_category     "Database"         "$ADMIN_TOKEN")
 ok "Categories created"
 
-# ---------- step 5: 30 courses + pricing + modules + trainer assignments ----
+# ---------- step 5: 60 courses + pricing + modules + trainer assignments ----
 
-hdr "Step 5: Creating 30 courses (pricing + modules + trainers)"
+hdr "Step 5: Creating 60 courses (pricing + modules + trainers)"
 
 # status: 1=Draft, 2=Published, 3=Archived
 # contentType: 1=Video, 2=Pdf, 3=Link
 
-# Course rows: catId | title | description | level | mode | duration | status | openAccess | featured
+# Course rows: catId | title | description | level | mode | duration | status | featured
 declare -a COURSES=(
-"$CAT_PROG|ASP.NET Core Mastery|Build production grade Web APIs using ASP.NET Core 8 with EF Core, JWT and clean architecture.|Intermediate|Online|10 weeks|2|true|true"
-"$CAT_PROG|Java Spring Boot Fundamentals|Master Spring Boot, Spring Data JPA, REST APIs and Spring Security.|Beginner|Hybrid|8 weeks|2|true|false"
-"$CAT_PROG|Modern C++ Programming|C++17 and C++20 features, RAII, smart pointers and templates.|Advanced|Online|10 weeks|2|true|false"
-"$CAT_PROG|Go for Backend Developers|Build scalable backends with Go, goroutines and channels.|Intermediate|Online|6 weeks|2|true|false"
-"$CAT_PROG|Rust Programming Bootcamp|Systems programming with Rust, ownership, lifetimes and async.|Advanced|Online|8 weeks|2|true|false"
+"$CAT_PROG|ASP.NET Core Mastery|Build production grade Web APIs using ASP.NET Core 8 with EF Core, JWT and clean architecture.|Intermediate|Online|10 weeks|2|true"
+"$CAT_PROG|Java Spring Boot Fundamentals|Master Spring Boot, Spring Data JPA, REST APIs and Spring Security.|Beginner|Hybrid|8 weeks|2|false"
+"$CAT_PROG|Modern C++ Programming|C++17 and C++20 features, RAII, smart pointers and templates.|Advanced|Online|10 weeks|2|false"
+"$CAT_PROG|Go for Backend Developers|Build scalable backends with Go, goroutines and channels.|Intermediate|Online|6 weeks|2|false"
+"$CAT_PROG|Rust Programming Bootcamp|Systems programming with Rust, ownership, lifetimes and async.|Advanced|Online|8 weeks|2|false"
+"$CAT_PROG|Python Programming Mastery|From basics to OOP, decorators, generators and async Python.|Beginner|Online|8 weeks|2|true"
+"$CAT_PROG|JavaScript Deep Dive|Closures, prototypes, event loop and modern ES2024 features.|Intermediate|Online|6 weeks|2|false"
+"$CAT_PROG|TypeScript Pro|Generics, conditional types, decorators and type-level programming.|Intermediate|Online|5 weeks|2|false"
+"$CAT_PROG|Kotlin Essentials|Modern JVM language with coroutines and null safety.|Beginner|Online|5 weeks|2|false"
+"$CAT_PROG|Ruby on Rails Foundations|Build web apps quickly with Rails 7 and Hotwire.|Beginner|Hybrid|6 weeks|1|false"
 
-"$CAT_WEB|React from Zero to Hero|Build modern SPAs with React 19, Vite, React Router, hooks and forms.|Beginner|Online|6 weeks|2|true|true"
-"$CAT_WEB|Full-Stack MERN Bootcamp|Build complete apps with MongoDB, Express, React and Node.js. Includes deployment.|Advanced|Hybrid|12 weeks|2|false|true"
-"$CAT_WEB|Vue.js Complete Guide|Composition API, Pinia, Vue Router and Vite tooling.|Intermediate|Online|6 weeks|2|true|false"
-"$CAT_WEB|Angular for Enterprise Apps|Build large Angular apps with RxJS and signals.|Advanced|Hybrid|10 weeks|2|false|false"
-"$CAT_WEB|Next.js Production Apps|App Router, server components and edge runtime.|Intermediate|Online|6 weeks|2|true|true"
+"$CAT_WEB|React from Zero to Hero|Build modern SPAs with React 19, Vite, React Router, hooks and forms.|Beginner|Online|6 weeks|2|true"
+"$CAT_WEB|Full-Stack MERN Bootcamp|Build complete apps with MongoDB, Express, React and Node.js. Includes deployment.|Advanced|Hybrid|12 weeks|2|true"
+"$CAT_WEB|Vue.js Complete Guide|Composition API, Pinia, Vue Router and Vite tooling.|Intermediate|Online|6 weeks|2|false"
+"$CAT_WEB|Angular for Enterprise Apps|Build large Angular apps with RxJS and signals.|Advanced|Hybrid|10 weeks|2|false"
+"$CAT_WEB|Next.js Production Apps|App Router, server components and edge runtime.|Intermediate|Online|6 weeks|2|true"
+"$CAT_WEB|Tailwind CSS Crash Course|Utility-first CSS, theming and component patterns.|Beginner|Online|3 weeks|2|false"
+"$CAT_WEB|GraphQL APIs with Apollo|Schemas, resolvers, subscriptions and federation.|Intermediate|Online|5 weeks|2|false"
+"$CAT_WEB|Svelte from Scratch|Reactive UI without a virtual DOM using SvelteKit.|Beginner|Online|4 weeks|2|false"
+"$CAT_WEB|REST API Design Best Practices|Versioning, pagination, errors, security and contracts.|Intermediate|Online|4 weeks|2|true"
 
-"$CAT_DATA|Python for Data Science|Numpy, Pandas, Matplotlib, Seaborn and scikit-learn.|Intermediate|Online|10 weeks|2|true|false"
-"$CAT_DATA|R Programming for Statistics|Data analysis and visualization with R and ggplot2.|Beginner|Online|6 weeks|2|true|false"
-"$CAT_DATA|Data Analysis with Pandas|Cleaning, transforming and visualizing data with Pandas.|Intermediate|Online|4 weeks|2|true|true"
-"$CAT_DATA|Big Data with Apache Spark|Distributed data processing with PySpark and Spark SQL.|Advanced|Hybrid|8 weeks|2|false|false"
+"$CAT_DATA|Python for Data Science|Numpy, Pandas, Matplotlib, Seaborn and scikit-learn.|Intermediate|Online|10 weeks|2|false"
+"$CAT_DATA|R Programming for Statistics|Data analysis and visualization with R and ggplot2.|Beginner|Online|6 weeks|2|false"
+"$CAT_DATA|Data Analysis with Pandas|Cleaning, transforming and visualizing data with Pandas.|Intermediate|Online|4 weeks|2|true"
+"$CAT_DATA|Big Data with Apache Spark|Distributed data processing with PySpark and Spark SQL.|Advanced|Hybrid|8 weeks|2|false"
+"$CAT_DATA|Tableau for Business Analytics|Dashboards, calculated fields and storytelling with data.|Beginner|Online|5 weeks|2|false"
+"$CAT_DATA|Power BI End to End|DAX, data modeling and publishing reports.|Intermediate|Online|6 weeks|2|true"
+"$CAT_DATA|Time Series Forecasting|ARIMA, Prophet and LSTM models for forecasting.|Advanced|Online|6 weeks|2|false"
 
-"$CAT_CLOUD|AWS Cloud Practitioner|Foundational AWS certification prep — EC2, S3, IAM, VPC, billing.|Beginner|Online|4 weeks|1|true|false"
-"$CAT_CLOUD|Azure Fundamentals|Azure services overview, identity, networking and AZ-900 prep.|Beginner|Online|4 weeks|2|true|true"
-"$CAT_CLOUD|Kubernetes for DevOps|Pods, deployments, services, ingress and Helm.|Advanced|Hybrid|8 weeks|2|false|true"
-"$CAT_CLOUD|Docker and Containers Deep Dive|Images, networking, volumes, Compose and best practices.|Intermediate|Online|4 weeks|2|true|false"
+"$CAT_CLOUD|AWS Cloud Practitioner|Foundational AWS certification prep — EC2, S3, IAM, VPC, billing.|Beginner|Online|4 weeks|1|false"
+"$CAT_CLOUD|Azure Fundamentals|Azure services overview, identity, networking and AZ-900 prep.|Beginner|Online|4 weeks|2|true"
+"$CAT_CLOUD|Kubernetes for DevOps|Pods, deployments, services, ingress and Helm.|Advanced|Hybrid|8 weeks|2|true"
+"$CAT_CLOUD|Docker and Containers Deep Dive|Images, networking, volumes, Compose and best practices.|Intermediate|Online|4 weeks|2|false"
+"$CAT_CLOUD|Google Cloud Platform Essentials|Compute Engine, GKE, Cloud Run and IAM.|Beginner|Online|5 weeks|2|false"
+"$CAT_CLOUD|CI/CD with GitHub Actions|Build, test and deploy pipelines for modern apps.|Intermediate|Online|4 weeks|2|true"
+"$CAT_CLOUD|Terraform for Infrastructure|Write reusable infrastructure as code with HCL.|Intermediate|Online|5 weeks|2|false"
+"$CAT_CLOUD|Ansible Automation|Configuration management with playbooks and roles.|Beginner|Online|4 weeks|1|false"
 
-"$CAT_MOB|Flutter Mobile App Development|Build cross-platform apps with Flutter, Dart and Riverpod.|Intermediate|Online|8 weeks|2|true|true"
-"$CAT_MOB|React Native Crash Course|Build mobile apps reusing your React skills.|Intermediate|Online|6 weeks|2|true|false"
-"$CAT_MOB|iOS Development with Swift|SwiftUI, MVVM and Combine for iOS apps.|Beginner|Hybrid|8 weeks|2|false|false"
+"$CAT_MOB|Flutter Mobile App Development|Build cross-platform apps with Flutter, Dart and Riverpod.|Intermediate|Online|8 weeks|2|true"
+"$CAT_MOB|React Native Crash Course|Build mobile apps reusing your React skills.|Intermediate|Online|6 weeks|2|false"
+"$CAT_MOB|iOS Development with Swift|SwiftUI, MVVM and Combine for iOS apps.|Beginner|Hybrid|8 weeks|2|false"
+"$CAT_MOB|Android with Jetpack Compose|Modern declarative Android UI with Compose and Hilt.|Intermediate|Online|7 weeks|2|true"
+"$CAT_MOB|Mobile App Performance Tuning|Memory, battery, frame rate and network optimization.|Advanced|Online|4 weeks|2|false"
 
-"$CAT_AI|Machine Learning Foundations|Supervised, unsupervised learning and model evaluation.|Intermediate|Online|10 weeks|2|true|true"
-"$CAT_AI|Deep Learning with PyTorch|Neural networks, CNNs, RNNs and transfer learning with PyTorch.|Advanced|Hybrid|12 weeks|2|false|true"
-"$CAT_AI|Natural Language Processing|Transformers, tokenization, embeddings and fine-tuning.|Advanced|Online|8 weeks|2|true|false"
-"$CAT_AI|Computer Vision Essentials|Image classification, detection and segmentation with deep learning.|Intermediate|Online|8 weeks|2|true|false"
+"$CAT_AI|Machine Learning Foundations|Supervised, unsupervised learning and model evaluation.|Intermediate|Online|10 weeks|2|true"
+"$CAT_AI|Deep Learning with PyTorch|Neural networks, CNNs, RNNs and transfer learning with PyTorch.|Advanced|Hybrid|12 weeks|2|true"
+"$CAT_AI|Natural Language Processing|Transformers, tokenization, embeddings and fine-tuning.|Advanced|Online|8 weeks|2|false"
+"$CAT_AI|Computer Vision Essentials|Image classification, detection and segmentation with deep learning.|Intermediate|Online|8 weeks|2|false"
+"$CAT_AI|Reinforcement Learning Basics|Markov decision processes, Q-learning and policy gradients.|Advanced|Online|6 weeks|2|false"
+"$CAT_AI|LLM Engineering for Developers|Prompting, RAG, agents and evals for production LLMs.|Intermediate|Online|5 weeks|2|true"
+"$CAT_AI|MLOps in Practice|Model serving, monitoring, retraining and feature stores.|Advanced|Hybrid|7 weeks|2|false"
+"$CAT_AI|Generative AI with Diffusion Models|Image generation, fine-tuning and ControlNet.|Advanced|Online|6 weeks|1|false"
 
-"$CAT_SEC|Ethical Hacking Bootcamp|Recon, scanning, exploitation and reporting.|Intermediate|Hybrid|10 weeks|2|false|true"
-"$CAT_SEC|Network Security Fundamentals|Firewalls, IDS, VPN and secure protocols.|Beginner|Online|6 weeks|2|true|false"
-"$CAT_SEC|Web Application Security|OWASP Top 10, SAST, DAST and secure coding.|Advanced|Online|8 weeks|2|true|false"
+"$CAT_SEC|Ethical Hacking Bootcamp|Recon, scanning, exploitation and reporting.|Intermediate|Hybrid|10 weeks|2|true"
+"$CAT_SEC|Network Security Fundamentals|Firewalls, IDS, VPN and secure protocols.|Beginner|Online|6 weeks|2|false"
+"$CAT_SEC|Web Application Security|OWASP Top 10, SAST, DAST and secure coding.|Advanced|Online|8 weeks|2|false"
+"$CAT_SEC|Cloud Security Essentials|IAM, KMS, network policies and threat detection in the cloud.|Intermediate|Online|6 weeks|2|true"
+"$CAT_SEC|DevSecOps Pipeline|Security gates, SBOM and supply chain hardening.|Intermediate|Online|5 weeks|2|false"
+"$CAT_SEC|Bug Bounty Hunter Path|Recon, OWASP exploitation and ethical reporting.|Advanced|Online|6 weeks|2|false"
 
-"$CAT_DB|SQL Mastery|Joins, indexes, window functions and query tuning.|Beginner|Online|6 weeks|2|true|true"
-"$CAT_DB|MongoDB for Developers|Documents, aggregation pipeline and indexing.|Intermediate|Online|4 weeks|2|true|false"
+"$CAT_DB|SQL Mastery|Joins, indexes, window functions and query tuning.|Beginner|Online|6 weeks|2|true"
+"$CAT_DB|MongoDB for Developers|Documents, aggregation pipeline and indexing.|Intermediate|Online|4 weeks|2|false"
+"$CAT_DB|PostgreSQL Deep Dive|Advanced indexing, partitioning, JSONB and performance.|Intermediate|Online|5 weeks|2|false"
+"$CAT_DB|Redis for Real-Time Apps|Caching strategies, pub/sub, streams and Lua scripting.|Intermediate|Online|3 weeks|2|true"
+"$CAT_DB|Elasticsearch and OpenSearch|Indexing, querying, analyzers and observability stacks.|Advanced|Online|5 weeks|2|false"
 )
 
 declare -a COURSE_IDS=()
@@ -327,23 +358,24 @@ declare -a COURSE_TRAINER_TOKENS=()
 
 CIDX=0
 for row in "${COURSES[@]}"; do
-  IFS='|' read -r CAT TITLE DESC LEVEL MODE DURATION STATUS OPEN FEAT <<< "$row"
+  IFS='|' read -r CAT TITLE DESC LEVEL MODE DURATION STATUS FEAT <<< "$row"
 
-  COURSE_ID=$(create_course "$CAT" "$TITLE" "$DESC" "$LEVEL" "$MODE" "$DURATION" "$STATUS" "$OPEN" "$FEAT" "$ADMIN_TOKEN")
+  COURSE_ID=$(create_course "$CAT" "$TITLE" "$DESC" "$LEVEL" "$MODE" "$DURATION" "$STATUS" "$FEAT" "$ADMIN_TOKEN")
   COURSE_IDS+=("$COURSE_ID")
 
-  # 1-2 pricings per course
-  PRICE=$((((RANDOM % 20) + 5) * 1000))
-  IS_FREE="false"
-  if (( RANDOM % 8 == 0 )); then
-    PRICE=0
-    IS_FREE="true"
-  fi
-  create_pricing "$COURSE_ID" 2025 "$PRICE" "$IS_FREE" "$ADMIN_TOKEN"
-  if (( RANDOM % 2 == 0 )); then
-    NEW_PRICE=$((PRICE + 2000))
-    [[ "$IS_FREE" == "true" ]] && NEW_PRICE=$((((RANDOM % 15) + 5) * 1000))
-    create_pricing "$COURSE_ID" 2026 "$NEW_PRICE" "false" "$ADMIN_TOKEN"
+  # Pricing: every course gets a 2026 row.
+  # Every 3rd course is free, the rest are paid in the 3000-15000 range.
+  # Half of paid courses also get a 2025 historical row (slightly cheaper).
+  if (( CIDX % 3 == 0 )); then
+    create_pricing "$COURSE_ID" 2026 0 "true" "$ADMIN_TOKEN"
+  else
+    PRICE=$((((CIDX * 1500) % 12000) + 3000))
+    create_pricing "$COURSE_ID" 2026 "$PRICE" "false" "$ADMIN_TOKEN"
+    if (( CIDX % 2 == 0 )); then
+      OLD_PRICE=$((PRICE - 1000))
+      [[ $OLD_PRICE -lt 1500 ]] && OLD_PRICE=2000
+      create_pricing "$COURSE_ID" 2025 "$OLD_PRICE" "false" "$ADMIN_TOKEN"
+    fi
   fi
 
   # 1-2 trainers per course
@@ -373,15 +405,15 @@ for row in "${COURSES[@]}"; do
   COURSE_MODULE_LISTS+=("$MODULE_IDS")
 
   CIDX=$((CIDX + 1))
-  if (( CIDX % 5 == 0 )); then
-    ok "  Created $CIDX/30 courses..."
+  if (( CIDX % 10 == 0 )); then
+    ok "  Created $CIDX/60 courses..."
   fi
 done
-ok "All 30 courses ready"
+ok "All 60 courses ready"
 
 # ---------- step 6: enrollments ---------------------------------------------
 
-hdr "Step 6: Creating enrollments (each student in 1-3 courses)"
+hdr "Step 6: Creating enrollments (each student in 2-4 courses)"
 
 YEAR_AGO=$(date -u -v -30d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
 TODAY=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -394,7 +426,7 @@ declare -a ALL_ENROLLMENT_COURSE_IDX=()
 NUM_COURSES=${#COURSE_IDS[@]}
 for ((s=0; s<NUM_STUDENTS; s++)); do
   STOK="${STUDENT_TOKENS[$s]}"
-  NUM_ENROLLS=$(( (RANDOM % 3) + 1 ))
+  NUM_ENROLLS=$(( (RANDOM % 3) + 2 ))
   # pick distinct course indexes
   declare -a PICKED=()
   while (( ${#PICKED[@]} < NUM_ENROLLS )); do
@@ -470,10 +502,10 @@ ok "Progress + lifecycle done. Completed: ${#COMPLETED_ENROLLMENT_IDS[@]}"
 
 # ---------- step 8: certificates -------------------------------------------
 
-hdr "Step 8: Issuing certificates for first 10 completed enrollments"
+hdr "Step 8: Issuing certificates for first 20 completed enrollments"
 COUNT=0
 for EID in "${COMPLETED_ENROLLMENT_IDS[@]}"; do
-  [[ $COUNT -ge 10 ]] && break
+  [[ $COUNT -ge 20 ]] && break
   if issue_certificate "$EID" "$ADMIN_TOKEN"; then
     COUNT=$((COUNT + 1))
   else
@@ -497,7 +529,7 @@ echo "  Students : (password = $STUDENT_PASS)"
 echo "             student001@training.local ... student$(printf "%03d" "$NUM_STUDENTS")@training.local"
 echo
 echo "  Categories : 8"
-echo "  Courses    : 30"
+echo "  Courses    : 60 (mix of Free, Paid, Published and a few Draft)"
 echo "  Enrollments: ${#ALL_ENROLLMENT_IDS[@]}"
 echo "  Certificates issued: $COUNT"
 echo

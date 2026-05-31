@@ -1,8 +1,8 @@
 # Azure SQL Seed Bootstrap
 
 The `scripts/seed-azure-bulk.sh` script populates a fully-empty Azure SQL DB
-with realistic demo data (admin + 10 trainers + 100 students + 30 courses +
-~200 enrollments + progress + certificates).
+with realistic demo data (admin + 12 trainers + 100 students + 60 courses +
+~300 enrollments + progress + ~20 certificates).
 
 It only requires that an admin user already exists with `Role = 3` in the DB.
 Follow these one-time steps before running the script.
@@ -89,7 +89,8 @@ Expect 4-7 minutes against Azure due to network latency.
 When it finishes you'll have:
 
 - `admin@training.local` / `Admin@12345`
-- `trainer.aman.sharma@training.local` ... 10 trainers / `Trainer@123`
+- `trainer.aman.sharma@training.local` ... 12 trainers / `Trainer@123`
 - `student001@training.local` ... `student100@training.local` / `Student@123`
-- 8 categories, 30 courses with pricing + modules + assigned trainers
-- ~200 enrollments with mixed progress + a handful of certificates
+- 8 categories, 60 courses with pricing + modules + assigned trainers
+  (mix of Free + Paid + a few Draft courses)
+- ~300 enrollments with mixed progress + ~20 certificates

@@ -79,6 +79,15 @@ public class AuthController : ControllerBase
 
 
 
+[HttpGet("trainers")]
+[Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetTrainers()
+    {
+        var trainers = await _authService.GetTrainersAsync();
+        return Ok(trainers);
+    }
+
+
 [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {

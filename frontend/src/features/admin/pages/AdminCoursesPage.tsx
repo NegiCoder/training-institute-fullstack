@@ -15,7 +15,6 @@ const courseSchema = z.object({
   mode: z.string().min(2, 'Mode is required'),
   duration: z.string().min(2, 'Duration is required'),
   status: z.number(),
-  isOpenAccess: z.boolean(),
   isFeatured: z.boolean(),
 })
 
@@ -30,8 +29,7 @@ type CourseFilters = {
   status: string
   level: string
   mode: string
-  featured: string
-  openAccess: string
+  price: string
 }
 
 function getStatusLabel(status: number): string {
@@ -59,8 +57,7 @@ export function AdminCoursesPage() {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterLevel, setFilterLevel] = useState('')
   const [filterMode, setFilterMode] = useState('')
-  const [filterFeatured, setFilterFeatured] = useState('')
-  const [filterOpenAccess, setFilterOpenAccess] = useState('')
+  const [filterPrice, setFilterPrice] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -80,7 +77,6 @@ export function AdminCoursesPage() {
       mode: 'Online',
       duration: '',
       status: CourseStatus.Draft,
-      isOpenAccess: false,
       isFeatured: false,
     },
   })
@@ -92,8 +88,7 @@ export function AdminCoursesPage() {
       status: filterStatus,
       level: filterLevel,
       mode: filterMode,
-      featured: filterFeatured,
-      openAccess: filterOpenAccess,
+      price: filterPrice,
     }
 
     try {
@@ -112,14 +107,8 @@ export function AdminCoursesPage() {
             : undefined,
           level: activeFilters.level || undefined,
           mode: activeFilters.mode || undefined,
-          isFeatured:
-            activeFilters.featured === ''
-              ? undefined
-              : activeFilters.featured === 'true',
-          isOpenAccess:
-            activeFilters.openAccess === ''
-              ? undefined
-              : activeFilters.openAccess === 'true',
+          isFree:
+            activeFilters.price === '' ? undefined : activeFilters.price === 'free',
           pageNumber: 1,
           pageSize: 50,
         }),
@@ -149,7 +138,6 @@ export function AdminCoursesPage() {
       mode: course.mode,
       duration: course.duration,
       status: course.status,
-      isOpenAccess: course.isOpenAccess,
       isFeatured: course.isFeatured,
     })
   }
@@ -164,7 +152,6 @@ export function AdminCoursesPage() {
       mode: 'Online',
       duration: '',
       status: CourseStatus.Draft,
-      isOpenAccess: false,
       isFeatured: false,
     })
   }
@@ -219,8 +206,7 @@ export function AdminCoursesPage() {
     setFilterStatus('')
     setFilterLevel('')
     setFilterMode('')
-    setFilterFeatured('')
-    setFilterOpenAccess('')
+    setFilterPrice('')
   }
 
   async function clearFilters() {
@@ -230,8 +216,7 @@ export function AdminCoursesPage() {
       status: '',
       level: '',
       mode: '',
-      featured: '',
-      openAccess: '',
+      price: '',
     }
 
     resetFilters()
@@ -307,21 +292,12 @@ export function AdminCoursesPage() {
         </select>
 
         <select
-          value={filterFeatured}
-          onChange={(event) => setFilterFeatured(event.target.value)}
+          value={filterPrice}
+          onChange={(event) => setFilterPrice(event.target.value)}
         >
-          <option value="">Featured + regular</option>
-          <option value="true">Featured only</option>
-          <option value="false">Regular only</option>
-        </select>
-
-        <select
-          value={filterOpenAccess}
-          onChange={(event) => setFilterOpenAccess(event.target.value)}
-        >
-          <option value="">Free + paid</option>
-          <option value="true">Open access only</option>
-          <option value="false">Paid only</option>
+          <option value="">All prices</option>
+          <option value="free">Free only</option>
+          <option value="paid">Paid only</option>
         </select>
 
         <button
@@ -402,11 +378,6 @@ export function AdminCoursesPage() {
         </label>
 
         <label className="checkbox-field">
-          <input type="checkbox" {...register('isOpenAccess')} />
-          <span>Open access</span>
-        </label>
-
-        <label className="checkbox-field">
           <input type="checkbox" {...register('isFeatured')} />
           <span>Featured</span>
         </label>
@@ -442,7 +413,7 @@ export function AdminCoursesPage() {
                 <th>Title</th>
                 <th>Category</th>
                 <th>Status</th>
-                <th>Featured</th>
+                <th>Price</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -453,7 +424,13 @@ export function AdminCoursesPage() {
                   <td>{course.title}</td>
                   <td>{course.categoryName}</td>
                   <td>{getStatusLabel(course.status)}</td>
-                  <td>{course.isFeatured ? 'Yes' : 'No'}</td>
+                  <td>
+                    {course.isFree
+                      ? 'Free'
+                      : course.currentPrice != null
+                        ? `₹${course.currentPrice}`
+                        : 'Paid'}
+                  </td>
                   <td>
                     <div className="table-actions">
                       <button

@@ -5,11 +5,11 @@ namespace TrainingInstitute.Api.Services;
 
 public interface ICourseService
 {
-    Task<List<CourseResponse>> GetAllAsync();
+    Task<List<CourseResponse>> GetAllAsync(bool includeDrafts = false);
 
-    Task<CourseResponse?> GetByIdAsync(int courseId);
+    Task<CourseResponse?> GetByIdAsync(int courseId, bool includeDrafts = false);
 
-    Task<PagedResponse<CourseResponse>> SearchAsync(CourseSearchRequest request);
+    Task<PagedResponse<CourseResponse>> SearchAsync(CourseSearchRequest request, bool includeDrafts = false);
 
     Task<CourseResponse> CreateAsync(int userId, CreateCourseRequest request);
 

@@ -476,6 +476,20 @@
   font-weight: 700;
 }
 
+.module-progress-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.module-list-detail li .muted {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-style: italic;
+  align-self: center;
+}
+
 .course-card-header,
 .course-meta,
 .pagination-row {

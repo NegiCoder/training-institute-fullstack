@@ -142,8 +142,13 @@ export function CourseDetailPage() {
         <span>{course.level}</span>
         <span>{course.mode}</span>
         <span>{course.duration}</span>
-        {course.isOpenAccess && <span>Open access</span>}
-        {course.isFeatured && <span>Featured</span>}
+        <span>
+          {course.isFree
+            ? 'Free'
+            : course.currentPrice != null
+              ? `₹${course.currentPrice}`
+              : 'Paid'}
+        </span>
       </div>
 
       <div className="detail-actions">
@@ -211,6 +216,18 @@ export function CourseDetailPage() {
                   <strong>{module.moduleName}</strong>
                   <span>{getContentTypeLabel(module.contentType)}</span>
                 </div>
+                {module.urlOrPath ? (
+                  <a
+                    className="secondary-button"
+                    href={module.urlOrPath}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open
+                  </a>
+                ) : (
+                  <span className="muted">Enroll to access</span>
+                )}
               </li>
             ))}
           </ol>

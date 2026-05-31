@@ -100,10 +100,10 @@ create_category() {
 create_course() {
   local catId="$1"; local title="$2"; local desc="$3"
   local level="$4"; local mode="$5"; local duration="$6"
-  local status="$7"; local openAccess="$8"; local featured="$9"
-  local token="${10}"
+  local status="$7"; local featured="$8"
+  local token="$9"
   post "$API/api/Courses" \
-"{\"courseCategoryId\":$catId,\"title\":\"$title\",\"description\":\"$desc\",\"level\":\"$level\",\"mode\":\"$mode\",\"duration\":\"$duration\",\"status\":$status,\"isOpenAccess\":$openAccess,\"isFeatured\":$featured}" \
+"{\"courseCategoryId\":$catId,\"title\":\"$title\",\"description\":\"$desc\",\"level\":\"$level\",\"mode\":\"$mode\",\"duration\":\"$duration\",\"status\":$status,\"isFeatured\":$featured}" \
     "$token" | jq -r '.courseId'
 }
 
@@ -281,7 +281,7 @@ hdr "Step 6: Creating 6 courses (with pricing, modules, trainer assignments)"
 # --- Course 1: ASP.NET Core Mastery (Trainer: Aman) ---
 C1=$(create_course "$CAT_PROG" "ASP.NET Core Mastery" \
   "Build production grade Web APIs using ASP.NET Core 8 with EF Core, JWT and clean architecture." \
-  "Intermediate" "Online" "10 weeks" 2 true true "$ADMIN_TOKEN")
+  "Intermediate" "Online" "10 weeks" 2 true "$ADMIN_TOKEN")
 create_pricing "$C1" 2025 14999 false "$ADMIN_TOKEN"
 create_pricing "$C1" 2026 16999 false "$ADMIN_TOKEN"
 assign_trainer "$C1" "$TRAINER1_ID" "$ADMIN_TOKEN"
@@ -294,7 +294,7 @@ ok "Course 1 (ASP.NET Core Mastery) ready"
 # --- Course 2: Java Spring Boot Fundamentals (Trainers: Aman + Priya) ---
 C2=$(create_course "$CAT_PROG" "Java Spring Boot Fundamentals" \
   "Master Spring Boot, Spring Data JPA, REST APIs and Spring Security." \
-  "Beginner" "Hybrid" "8 weeks" 2 true false "$ADMIN_TOKEN")
+  "Beginner" "Hybrid" "8 weeks" 2 false "$ADMIN_TOKEN")
 create_pricing "$C2" 2025 12999 false "$ADMIN_TOKEN"
 create_pricing "$C2" 2026 13999 false "$ADMIN_TOKEN"
 assign_trainer "$C2" "$TRAINER1_ID" "$ADMIN_TOKEN"
@@ -308,7 +308,7 @@ ok "Course 2 (Spring Boot) ready"
 # --- Course 3: React from Zero to Hero (Trainer: Priya) ---
 C3=$(create_course "$CAT_WEB" "React from Zero to Hero" \
   "Build modern SPAs with React 19, Vite, React Router, hooks, Zustand and forms." \
-  "Beginner" "Online" "6 weeks" 2 true true "$ADMIN_TOKEN")
+  "Beginner" "Online" "6 weeks" 2 true "$ADMIN_TOKEN")
 create_pricing "$C3" 2025 0 true "$ADMIN_TOKEN"
 create_pricing "$C3" 2026 9999 false "$ADMIN_TOKEN"
 assign_trainer "$C3" "$TRAINER2_ID" "$ADMIN_TOKEN"
@@ -322,7 +322,7 @@ ok "Course 3 (React) ready"
 # --- Course 4: Full-Stack MERN Bootcamp (Trainers: Priya + Rahul) ---
 C4=$(create_course "$CAT_WEB" "Full-Stack MERN Bootcamp" \
   "Build complete apps with MongoDB, Express, React and Node.js. Includes deployment." \
-  "Advanced" "Hybrid" "12 weeks" 2 false true "$ADMIN_TOKEN")
+  "Advanced" "Hybrid" "12 weeks" 2 true "$ADMIN_TOKEN")
 create_pricing "$C4" 2026 24999 false "$ADMIN_TOKEN"
 assign_trainer "$C4" "$TRAINER2_ID" "$ADMIN_TOKEN"
 assign_trainer "$C4" "$TRAINER3_ID" "$ADMIN_TOKEN"
@@ -336,7 +336,7 @@ ok "Course 4 (MERN) ready"
 # --- Course 5: Python for Data Science (Trainer: Rahul) ---
 C5=$(create_course "$CAT_DATA" "Python for Data Science" \
   "Numpy, Pandas, Matplotlib, Seaborn, scikit-learn. End to end ML project." \
-  "Intermediate" "Online" "10 weeks" 2 true false "$ADMIN_TOKEN")
+  "Intermediate" "Online" "10 weeks" 2 false "$ADMIN_TOKEN")
 create_pricing "$C5" 2025 11999 false "$ADMIN_TOKEN"
 create_pricing "$C5" 2026 12999 false "$ADMIN_TOKEN"
 assign_trainer "$C5" "$TRAINER3_ID" "$ADMIN_TOKEN"
@@ -349,7 +349,7 @@ ok "Course 5 (Python DS) ready"
 # --- Course 6: AWS Cloud Practitioner (Trainer: Aman, status=Draft) ---
 C6=$(create_course "$CAT_CLOUD" "AWS Cloud Practitioner" \
   "Foundational AWS certification prep — EC2, S3, IAM, VPC, billing." \
-  "Beginner" "Online" "4 weeks" 1 true false "$ADMIN_TOKEN")
+  "Beginner" "Online" "4 weeks" 1 false "$ADMIN_TOKEN")
 create_pricing "$C6" 2026 7999 false "$ADMIN_TOKEN"
 assign_trainer "$C6" "$TRAINER1_ID" "$ADMIN_TOKEN"
 C6M1=$(create_module "$C6" "AWS Overview"               1 "https://example.com/aws/01.mp4" 1 "$TRAINER1_TOKEN")

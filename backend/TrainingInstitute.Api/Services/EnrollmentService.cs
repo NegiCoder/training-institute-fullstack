@@ -27,11 +27,11 @@ public class EnrollmentService : IEnrollmentService
         }
 
         var courseExists = await _context.Courses
-            .AnyAsync(c => c.CourseId == request.CourseId && c.Status != CourseStatus.Archived);
+            .AnyAsync(c => c.CourseId == request.CourseId && c.Status == CourseStatus.Published);
 
         if (!courseExists)
         {
-            throw new InvalidOperationException("Course not found or archived.");
+            throw new InvalidOperationException("Course not found or not published.");
         }
 
         var alreadyEnrolled = await _context.CourseEnrollments

@@ -10,8 +10,9 @@ export type CourseResponse = {
   mode: string
   duration: string
   status: CourseStatus
-  isOpenAccess: boolean
   isFeatured: boolean
+  isFree: boolean
+  currentPrice?: number | null
   createdAt: string
   updatedAt?: string | null
 }
@@ -24,7 +25,6 @@ export type CreateCourseRequest = {
   mode: string
   duration: string
   status: CourseStatus
-  isOpenAccess: boolean
   isFeatured: boolean
 }
 
@@ -36,8 +36,8 @@ export type CourseSearchRequest = {
   level?: string
   mode?: string
   status?: CourseStatus
-  isOpenAccess?: boolean
   isFeatured?: boolean
+  isFree?: boolean
   pageNumber: number
   pageSize: number
 }

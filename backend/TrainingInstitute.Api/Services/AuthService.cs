@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TrainingInstitute.Api.Data;
 using TrainingInstitute.Api.DTOs.Auth;
 using TrainingInstitute.Api.Models;
+using TrainingInstitute.Api.Models.Enums;
 
 namespace TrainingInstitute.Api.Services;
 
@@ -112,6 +113,17 @@ public class AuthService : IAuthService
 
     }
 
-
-
+    public async Task<List<TrainerListItem>> GetTrainersAsync()
+    {
+        return await _dbContext.Users
+            .Where(u => u.Role == UserRole.Trainer && u.IsActive)
+            .OrderBy(u => u.FullName)
+            .Select(u => new TrainerListItem
+            {
+                UserId = u.UserId,
+                FullName = u.FullName,
+                Email = u.Email
+            })
+            .ToListAsync();
+    }
 }

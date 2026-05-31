@@ -20,21 +20,21 @@ public class CoursesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var courses = await _courseService.GetAllAsync();
+        var courses = await _courseService.GetAllAsync(CanSeeDrafts());
         return Ok(courses);
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] CourseSearchRequest request)
     {
-        var result = await _courseService.SearchAsync(request);
+        var result = await _courseService.SearchAsync(request, CanSeeDrafts());
         return Ok(result);
     }
 
     [HttpGet("{courseId}")]
     public async Task<IActionResult> GetById(int courseId)
     {
-        var course = await _courseService.GetByIdAsync(courseId);
+        var course = await _courseService.GetByIdAsync(courseId, CanSeeDrafts());
 
         if (course == null)
         {
@@ -42,6 +42,11 @@ public class CoursesController : ControllerBase
         }
 
         return Ok(course);
+    }
+
+    private bool CanSeeDrafts()
+    {
+        return User.IsInRole("Admin") || User.IsInRole("Trainer");
     }
 
     [HttpPost]
