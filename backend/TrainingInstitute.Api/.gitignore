@@ -1,0 +1,33 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+.vs/
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+appsettings.Development.json
+
+# NuGet
+packages/
+
+# Publish
+publish/
+
+# EF migrations snapshot backup
+*.bak
+
+# Node modules if frontend added later
+node_modules/
