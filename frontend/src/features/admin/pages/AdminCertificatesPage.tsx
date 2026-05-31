@@ -125,9 +125,7 @@ export function AdminCertificatesPage() {
             {...register('courseEnrollmentId', { valueAsNumber: true })}
           />
           {errors.courseEnrollmentId && (
-            <small className="field-error">
-              {errors.courseEnrollmentId.message}
-            </small>
+            <small className="field-error">{errors.courseEnrollmentId.message}</small>
           )}
         </label>
 

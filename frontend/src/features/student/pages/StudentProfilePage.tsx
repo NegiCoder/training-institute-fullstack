@@ -93,8 +93,7 @@ export function StudentProfilePage() {
 
     const request = {
       ...values,
-      passoutYear:
-        values.passoutYear === '' ? null : Number(values.passoutYear),
+      passoutYear: values.passoutYear === '' ? null : Number(values.passoutYear),
     }
 
     try {
@@ -124,8 +123,8 @@ export function StudentProfilePage() {
       <p className="eyebrow">Student</p>
       <h1>My Profile</h1>
       <p className="page-text">
-        Complete your student profile so enrollments and certificates can use
-        accurate information.
+        Complete your student profile so enrollments and certificates can use accurate
+        information.
       </p>
 
       <form className="profile-form" onSubmit={handleSubmit(onSubmit)}>
@@ -195,12 +194,18 @@ export function StudentProfilePage() {
 
         {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-        {successMessage && (
-          <div className="alert success-alert">{successMessage}</div>
-        )}
+        {successMessage && <div className="alert success-alert">{successMessage}</div>}
 
-        <button className="primary-button full-width" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : hasProfile ? 'Update profile' : 'Create profile'}
+        <button
+          className="primary-button full-width"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? 'Saving...'
+            : hasProfile
+              ? 'Update profile'
+              : 'Create profile'}
         </button>
       </form>
     </section>

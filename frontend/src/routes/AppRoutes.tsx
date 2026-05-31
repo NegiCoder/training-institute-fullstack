@@ -50,22 +50,13 @@ export function AppRoutes() {
               element={<AdminCourseCategoriesPage />}
             />
             <Route path="/admin/courses" element={<AdminCoursesPage />} />
-            <Route
-              path="/admin/course-pricing"
-              element={<AdminCoursePricingPage />}
-            />
+            <Route path="/admin/course-pricing" element={<AdminCoursePricingPage />} />
             <Route
               path="/admin/course-trainers"
               element={<AdminCourseTrainersPage />}
             />
-            <Route
-              path="/admin/create-trainer"
-              element={<AdminCreateTrainerPage />}
-            />
-            <Route
-              path="/admin/create-admin"
-              element={<AdminCreateAdminPage />}
-            />
+            <Route path="/admin/create-trainer" element={<AdminCreateTrainerPage />} />
+            <Route path="/admin/create-admin" element={<AdminCreateAdminPage />} />
             <Route path="/admin/students" element={<AdminStudentsPage />} />
             <Route path="/admin/enrollments" element={<AdminEnrollmentsPage />} />
             <Route path="/admin/certificates" element={<AdminCertificatesPage />} />
@@ -85,10 +76,7 @@ export function AppRoutes() {
           <Route element={<RoleRoute allowedRoles={['Trainer']} />}>
             <Route path="/trainer" element={<TrainerDashboardPage />} />
             <Route path="/trainer/courses" element={<TrainerCoursesPage />} />
-            <Route
-              path="/trainer/modules"
-              element={<TrainerCourseModulesPage />}
-            />
+            <Route path="/trainer/modules" element={<TrainerCourseModulesPage />} />
             <Route path="/trainer/students" element={<TrainerStudentsPage />} />
           </Route>
         </Route>

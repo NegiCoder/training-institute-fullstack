@@ -1,8 +1,5 @@
 import { apiClient } from '@/services/apiClient'
-import type {
-  MarkModuleCompleteRequest,
-  StudentModuleProgressResponse,
-} from '@/types'
+import type { MarkModuleCompleteRequest, StudentModuleProgressResponse } from '@/types'
 
 export const progressService = {
   async markModuleComplete(

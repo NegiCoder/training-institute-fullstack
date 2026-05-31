@@ -4,11 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { courseCategoryService } from '@/services/courseCategoryService'
 import { courseService } from '@/services/courseService'
-import {
-  CourseStatus,
-  type CourseCategoryResponse,
-  type CourseResponse,
-} from '@/types'
+import { CourseStatus, type CourseCategoryResponse, type CourseResponse } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 
 const courseSchema = z.object({
@@ -181,9 +177,7 @@ export function AdminCoursesPage() {
     <section className="page-card">
       <p className="eyebrow">Admin</p>
       <h1>Courses</h1>
-      <p className="page-text">
-        Create, publish, feature, search, and manage courses.
-      </p>
+      <p className="page-text">Create, publish, feature, search, and manage courses.</p>
 
       <div className="catalog-toolbar">
         <input
@@ -203,18 +197,13 @@ export function AdminCoursesPage() {
           <select {...register('courseCategoryId', { valueAsNumber: true })}>
             <option value={0}>Select category</option>
             {categories.map((category) => (
-              <option
-                key={category.courseCategoryId}
-                value={category.courseCategoryId}
-              >
+              <option key={category.courseCategoryId} value={category.courseCategoryId}>
                 {category.name}
               </option>
             ))}
           </select>
           {errors.courseCategoryId && (
-            <small className="field-error">
-              {errors.courseCategoryId.message}
-            </small>
+            <small className="field-error">{errors.courseCategoryId.message}</small>
           )}
         </label>
 
@@ -237,9 +226,7 @@ export function AdminCoursesPage() {
         <label className="form-field">
           <span>Mode</span>
           <input type="text" {...register('mode')} />
-          {errors.mode && (
-            <small className="field-error">{errors.mode.message}</small>
-          )}
+          {errors.mode && <small className="field-error">{errors.mode.message}</small>}
         </label>
 
         <label className="form-field">
@@ -279,11 +266,7 @@ export function AdminCoursesPage() {
             {editingCourse ? 'Update course' : 'Create course'}
           </button>
           {editingCourse && (
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={cancelEdit}
-            >
+            <button className="secondary-button" type="button" onClick={cancelEdit}>
               Cancel
             </button>
           )}
@@ -292,9 +275,7 @@ export function AdminCoursesPage() {
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
-      {successMessage && (
-        <div className="alert success-alert">{successMessage}</div>
-      )}
+      {successMessage && <div className="alert success-alert">{successMessage}</div>}
 
       {isLoading && <p className="page-text">Loading courses...</p>}
 
