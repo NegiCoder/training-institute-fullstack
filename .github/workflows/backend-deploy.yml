@@ -1,0 +1,48 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    name: Build image and deploy backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name anshultrainingacr
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t anshultrainingacr.azurecr.io/training-institute-api:${{ github.sha }} \
+            -t anshultrainingacr.azurecr.io/training-institute-api:latest \
+            -f backend/TrainingInstitute.Api/Dockerfile \
+            backend/TrainingInstitute.Api \
+            --push
+
+      - name: Deploy to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name training-institute-api \
+            --resource-group rg-training-institute-dev \
+            --image anshultrainingacr.azurecr.io/training-institute-api:${{ github.sha }}
