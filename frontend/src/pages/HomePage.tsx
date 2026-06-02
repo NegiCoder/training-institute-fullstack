@@ -6,8 +6,8 @@ export function HomePage() {
       <p className="eyebrow">ExcelGens</p>
       <h1>Learn. Track. Certify.</h1>
       <p className="page-text">
-        ExcelGens helps learners discover practical courses, track module progress,
-        and earn verified certificates from one simple training platform.
+        ExcelGens helps learners discover practical courses, track module progress, and
+        earn verified certificates from one simple training platform.
       </p>
 
       <div className="info-list">
