@@ -13,6 +13,7 @@ export type {
 export type {
   CertificateResponse,
   CertificateSearchRequest,
+  CertificateVerifyResponse,
   IssueCertificateRequest,
 } from '@/types/certificate'
 export type {

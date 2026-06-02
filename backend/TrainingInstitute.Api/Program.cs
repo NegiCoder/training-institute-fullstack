@@ -35,6 +35,8 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 builder.Services.Configure<CertificateStorageSettings>(builder.Configuration.GetSection("CertificateStorage"));
+// CertificateVerify section bind - PDF generator yaha se frontend URL leke QR banata hai
+builder.Services.Configure<CertificateVerifySettings>(builder.Configuration.GetSection("CertificateVerify"));
 builder.Services.AddScoped<ICertificatePdfGenerator, CertificatePdfGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 

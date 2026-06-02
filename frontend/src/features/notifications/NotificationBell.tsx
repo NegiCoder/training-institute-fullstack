@@ -205,7 +205,9 @@ export function NotificationBell() {
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-label={
-          unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+          unreadCount > 0
+            ? `Notifications, ${unreadCount} unread`
+            : 'Notifications'
         }
       >
         <span aria-hidden="true">🔔</span>

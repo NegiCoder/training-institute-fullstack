@@ -265,6 +265,53 @@ public class CertificateService : ICertificateService
             Content = bytes
         };
     }
+// Public verify - email/phone jaise sensitive fields yaha kabhi mat return karna.
+// Sirf certificate number, student name, course title aur date enough hai.
+public async Task<CertificateVerifyResponse> VerifyAsync(string certificateNumber)
+{
+    var trimmed = (certificateNumber ?? string.Empty).Trim();
+
+    if (string.IsNullOrEmpty(trimmed))
+    {
+        return new CertificateVerifyResponse
+        {
+            IsValid = false,
+            CertificateNumber = string.Empty
+        };
+    }
+
+    var certificate = await _context.CertificateIssued
+        .Include(c => c.Enrollment)
+            .ThenInclude(e => e!.Student)
+        .Include(c => c.Enrollment)
+            .ThenInclude(e => e!.Course)
+        .FirstOrDefaultAsync(c => c.CertificateNumber == trimmed);
+
+    if (certificate == null)
+    {
+        // Match nahi mila - frontend ko clear "invalid" message bhej do.
+        return new CertificateVerifyResponse
+        {
+            IsValid = false,
+            CertificateNumber = trimmed
+        };
+    }
+
+    var student = certificate.Enrollment?.Student;
+    var course = certificate.Enrollment?.Course;
+
+    return new CertificateVerifyResponse
+    {
+        IsValid = true,
+        CertificateNumber = certificate.CertificateNumber,
+        StudentName = student == null
+            ? null
+            : $"{student.FirstName} {student.LastName}".Trim(),
+        CourseTitle = course?.Title,
+        IssuedAt = certificate.IssuedAt
+    };
+}
+
 public async Task<PagedResponse<CertificateResponse>> SearchAsync(CertificateSearchRequest request)
 {
     var pageNumber = request.PageNumber < 1 ? 1 : request.PageNumber;

@@ -1,6 +1,9 @@
+using Microsoft.Extensions.Options;
+using QRCoder;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using TrainingInstitute.Api.Configuration;
 
 namespace TrainingInstitute.Api.Services;
 
@@ -8,8 +11,16 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
 {
     private const string OrganizationName = "ExcelGens";
 
-    // Cached so we read the logo file from disk only once per process lifetime
+    // Logo ek baar disk se padh ke memory me cache kar liya - har certificate
+    // ke liye fir-fir IO nahi karna padta.
     private static readonly Lazy<byte[]?> LogoBytes = new(LoadLogo);
+
+    private readonly CertificateVerifySettings _verifySettings;
+
+    public CertificatePdfGenerator(IOptions<CertificateVerifySettings> verifyOptions)
+    {
+        _verifySettings = verifyOptions.Value;
+    }
 
     public byte[] GenerateCertificatePdf(
         string studentName,
@@ -18,6 +29,10 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
         DateTime issuedAt)
     {
         var logo = LogoBytes.Value;
+
+        // QR code generate karte hai jisme verify page ka full URL ho.
+        // Recruiter QR scan karega -> frontend verify page khulega -> backend hit hoga.
+        var qrCode = BuildVerifyQrCode(certificateNumber);
 
         return Document.Create(container =>
         {
@@ -39,6 +54,8 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                     {
                         column.Spacing(12);
 
+                        // Header: sirf logo dikhate hai. Logo ke saath wapas
+                        // "ExcelGens" likhna messy lagta tha, isliye hata diya.
                         column.Item()
                             .AlignCenter()
                             .Element(header =>
@@ -52,6 +69,7 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                                 }
                                 else
                                 {
+                                    // Logo missing case - text fallback rakha hai
                                     header.Text(OrganizationName)
                                         .FontSize(26)
                                         .Bold()
@@ -116,39 +134,56 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                             .LineHorizontal(1)
                             .LineColor(Colors.Yellow.Darken2);
 
+                        // Footer ka pehla row: bayi taraf cert number+date, dayi taraf QR code.
                         column.Item()
                             .PaddingTop(4)
                             .Row(row =>
-                        {
-                            row.RelativeItem()
-                                .Column(left =>
-                                {
-                                    left.Item()
-                                        .Text("Certificate Number")
-                                        .FontSize(11)
-                                        .SemiBold()
-                                        .FontColor(Colors.Grey.Darken2);
-                                    left.Item()
-                                        .Text(certificateNumber)
-                                        .FontSize(12)
-                                        .FontColor(Colors.Black);
-                                });
+                            {
+                                row.RelativeItem()
+                                    .Column(left =>
+                                    {
+                                        left.Item()
+                                            .Text("Certificate Number")
+                                            .FontSize(11)
+                                            .SemiBold()
+                                            .FontColor(Colors.Grey.Darken2);
+                                        left.Item()
+                                            .Text(certificateNumber)
+                                            .FontSize(12)
+                                            .FontColor(Colors.Black);
 
-                            row.RelativeItem()
-                                .AlignRight()
-                                .Column(right =>
+                                        left.Item()
+                                            .PaddingTop(8)
+                                            .Text("Issued Date")
+                                            .FontSize(11)
+                                            .SemiBold()
+                                            .FontColor(Colors.Grey.Darken2);
+                                        left.Item()
+                                            .Text(issuedAt.ToString("dd MMM yyyy"))
+                                            .FontSize(12)
+                                            .FontColor(Colors.Black);
+                                    });
+
+                                // QR right side me - sirf tabhi dikhate hai jab
+                                // verify URL configured ho.
+                                if (qrCode != null)
                                 {
-                                    right.Item()
-                                        .Text("Issued Date")
-                                        .FontSize(11)
-                                        .SemiBold()
-                                        .FontColor(Colors.Grey.Darken2);
-                                    right.Item()
-                                        .Text(issuedAt.ToString("dd MMM yyyy"))
-                                        .FontSize(12)
-                                        .FontColor(Colors.Black);
-                                });
-                        });
+                                    row.ConstantItem(100)
+                                        .Column(right =>
+                                        {
+                                            right.Item()
+                                                .Width(90)
+                                                .Height(90)
+                                                .Image(qrCode);
+
+                                            right.Item()
+                                                .AlignCenter()
+                                                .Text("Scan to verify")
+                                                .FontSize(9)
+                                                .FontColor(Colors.Grey.Darken1);
+                                        });
+                                }
+                            });
 
                         column.Item()
                             .PaddingTop(8)
@@ -160,6 +195,26 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                     });
             });
         }).GeneratePdf();
+    }
+
+    // QR code ko PNG bytes me convert karte hai.
+    // Agar verify URL configured nahi hai to QR skip ho jata hai (PDF still works).
+    private byte[]? BuildVerifyQrCode(string certificateNumber)
+    {
+        var baseUrl = _verifySettings.FrontendBaseUrl?.TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            return null;
+        }
+
+        var verifyUrl = $"{baseUrl}/verify/{certificateNumber}";
+
+        using var generator = new QRCodeGenerator();
+        using var data = generator.CreateQrCode(verifyUrl, QRCodeGenerator.ECCLevel.Q);
+        using var pngQr = new PngByteQRCode(data);
+
+        // 8 = pixel size per QR module. ~200x200 size aata hai jo crisp dikhta hai.
+        return pngQr.GetGraphic(8);
     }
 
     private static byte[]? LoadLogo()

@@ -91,6 +91,19 @@ public class CertificatesController : ControllerBase
         return Ok(certificate);
     }
 
+    // Public verify endpoint - intentionally [AllowAnonymous].
+    // Recruiter ya koi bhi outsider yaha aake certificate ka authenticity check kar sake.
+    // Sirf minimum data return hota hai (service layer dekho).
+    [HttpGet("verify/{certificateNumber}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Verify(string certificateNumber)
+    {
+        var result = await _certificateService.VerifyAsync(certificateNumber);
+        // Hum hamesha 200 OK bhejte hai. isValid flag se frontend decide karega
+        // ki "Verified" card dikhana hai ya "Not Found" card.
+        return Ok(result);
+    }
+
     [HttpGet("download/{certificateIssuedId:int}")]
     public async Task<IActionResult> Download(int certificateIssuedId)
     {

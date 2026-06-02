@@ -17,6 +17,15 @@ export type IssueCertificateRequest = {
   courseEnrollmentId: number
 }
 
+export type CertificateVerifyResponse = {
+  isValid: boolean
+  certificateNumber: string
+  studentName?: string | null
+  courseTitle?: string | null
+  issuedAt?: string | null
+  issuedBy: string
+}
+
 export type CertificateSearchRequest = {
   searchTerm?: string
   courseEnrollmentId?: number

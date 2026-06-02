@@ -2,6 +2,7 @@ import { apiClient } from '@/services/apiClient'
 import type {
   CertificateResponse,
   CertificateSearchRequest,
+  CertificateVerifyResponse,
   IssueCertificateRequest,
   PagedResponse,
 } from '@/types'
@@ -35,6 +36,15 @@ export const certificateService = {
       {
         params: request,
       },
+    )
+    return response.data
+  },
+
+  // Public verify endpoint - koi bhi token ke bina call kar sakta hai.
+  // Backend isValid=true/false return karta hai, hum waise hi UI me dikhate hai.
+  async verify(certificateNumber: string): Promise<CertificateVerifyResponse> {
+    const response = await apiClient.get<CertificateVerifyResponse>(
+      `/api/Certificates/verify/${encodeURIComponent(certificateNumber)}`,
     )
     return response.data
   },

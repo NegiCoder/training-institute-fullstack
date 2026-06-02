@@ -19,6 +19,8 @@ export function PublicLayout() {
         <nav className="site-nav-primary" aria-label="Main navigation">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/courses">Courses</NavLink>
+          {/* Public verify link - har user role ke liye visible (login optional) */}
+          <NavLink to="/verify">Verify</NavLink>
 
           {isAuthenticated && user ? (
             <>

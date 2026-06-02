@@ -1295,3 +1295,134 @@
     flex-direction: column;
   }
 }
+
+/* ===== Certificate Verify Page ===== */
+.verify-card {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.verify-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.verify-input {
+  flex: 1 1 280px;
+  min-width: 220px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  color: #1f2937;
+}
+
+.verify-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.verify-message {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.verify-error {
+  color: #b91c1c;
+}
+
+.verify-result {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.4rem;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.verify-result-success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.verify-result-invalid {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.verify-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.verify-badge {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.verify-badge-success {
+  background: #16a34a;
+  color: #fff;
+}
+
+.verify-badge-invalid {
+  background: #dc2626;
+  color: #fff;
+}
+
+.verify-subtle {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.verify-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1.5rem;
+  margin: 0;
+}
+
+.verify-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.verify-grid dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.verify-grid dd {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.verify-footnote {
+  margin: 1.1rem 0 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+@media (max-width: 540px) {
+  .verify-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

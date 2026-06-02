@@ -22,6 +22,7 @@ import { TrainerCoursesPage } from '@/features/trainer/pages/TrainerCoursesPage'
 import { TrainerDashboardPage } from '@/features/trainer/pages/TrainerDashboardPage'
 import { TrainerStudentsPage } from '@/features/trainer/pages/TrainerStudentsPage'
 import { PublicLayout } from '@/layouts/PublicLayout'
+import { CertificateVerifyPage } from '@/pages/CertificateVerifyPage'
 import { CourseCatalogPage } from '@/pages/CourseCatalogPage'
 import { CourseDetailPage } from '@/pages/CourseDetailPage'
 import { HomePage } from '@/pages/HomePage'
@@ -38,6 +39,9 @@ export function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/courses" element={<CourseCatalogPage />} />
         <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+        {/* Public verify routes - login ki zarurat nahi, ProtectedRoute ke bahar rakhe hai */}
+        <Route path="/verify" element={<CertificateVerifyPage />} />
+        <Route path="/verify/:certNumber" element={<CertificateVerifyPage />} />
 
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<LoginPage />} />
