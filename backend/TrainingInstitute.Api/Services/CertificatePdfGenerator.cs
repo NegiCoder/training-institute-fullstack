@@ -24,96 +24,137 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
             container.Page(page =>
             {
                 page.Size(PageSizes.A4.Landscape());
-                page.Margin(40);
+                page.Margin(28);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(18));
+                page.DefaultTextStyle(x => x.FontSize(14).FontColor(Colors.Grey.Darken4));
 
                 page.Content()
-                    .Border(4)
-                    .BorderColor(Colors.Blue.Medium)
-                    .Padding(40)
+                    .Border(2)
+                    .BorderColor(Colors.Blue.Darken3)
+                    .Padding(6)
+                    .Border(1)
+                    .BorderColor(Colors.Yellow.Darken2)
+                    .Padding(24)
                     .Column(column =>
                     {
-                        column.Spacing(20);
+                        column.Spacing(12);
 
-                        // Header: logo + org name
-                        column.Item().Row(headerRow =>
-                        {
-                            if (logo != null)
+                        column.Item()
+                            .AlignCenter()
+                            .Element(header =>
                             {
-                                headerRow.AutoItem()
-                                    .Width(70)
-                                    .Height(70)
-                                    .Image(logo)
-                                    .FitArea();
+                                if (logo != null)
+                                {
+                                    header.Width(78)
+                                        .Height(78)
+                                        .Image(logo)
+                                        .FitArea();
+                                }
+                                else
+                                {
+                                    header.Text(OrganizationName)
+                                        .FontSize(26)
+                                        .Bold()
+                                        .FontColor(Colors.Blue.Darken2);
+                                }
+                            });
 
-                                headerRow.ConstantItem(15);
-                            }
+                        column.Item()
+                            .AlignCenter()
+                            .Text("Professional Learning · Verified Certificate")
+                            .FontSize(11)
+                            .FontColor(Colors.Grey.Darken1);
 
-                            headerRow.RelativeItem()
-                                .AlignMiddle()
-                                .Text(OrganizationName)
-                                .FontSize(28)
-                                .Bold()
-                                .FontColor(Colors.Blue.Darken2);
-                        });
+                        column.Item()
+                            .PaddingVertical(2)
+                            .LineHorizontal(1)
+                            .LineColor(Colors.Yellow.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text("Certificate of Completion")
-                            .FontSize(36)
+                            .FontSize(34)
                             .Bold()
-                            .FontColor(Colors.Blue.Darken2);
+                            .FontColor(Colors.Blue.Darken3);
 
                         column.Item()
                             .AlignCenter()
                             .Text("This certificate is proudly presented to")
-                            .FontSize(18);
+                            .FontSize(15)
+                            .Italic()
+                            .FontColor(Colors.Grey.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text(studentName)
-                            .FontSize(32)
+                            .FontSize(31)
                             .Bold()
                             .FontColor(Colors.Black);
 
                         column.Item()
                             .AlignCenter()
+                            .Width(280)
+                            .LineHorizontal(1)
+                            .LineColor(Colors.Grey.Lighten1);
+
+                        column.Item()
+                            .AlignCenter()
                             .Text("for successfully completing the course")
-                            .FontSize(18);
+                            .FontSize(15)
+                            .Italic()
+                            .FontColor(Colors.Grey.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text(courseTitle)
-                            .FontSize(28)
+                            .FontSize(24)
                             .SemiBold()
                             .FontColor(Colors.Green.Darken2);
 
                         column.Item()
-                            .PaddingTop(20)
-                            .Row(row =>
-                            {
-                                row.RelativeItem()
-                                    .Column(left =>
-                                    {
-                                        left.Item().Text("Certificate Number").FontSize(14).SemiBold();
-                                        left.Item().Text(certificateNumber).FontSize(14);
-                                    });
-
-                                row.RelativeItem()
-                                    .AlignRight()
-                                    .Column(right =>
-                                    {
-                                        right.Item().Text("Issued Date").FontSize(14).SemiBold();
-                                        right.Item().Text(issuedAt.ToString("dd MMM yyyy")).FontSize(14);
-                                    });
-                            });
+                            .PaddingTop(10)
+                            .LineHorizontal(1)
+                            .LineColor(Colors.Yellow.Darken2);
 
                         column.Item()
-                            .PaddingTop(20)
+                            .PaddingTop(4)
+                            .Row(row =>
+                        {
+                            row.RelativeItem()
+                                .Column(left =>
+                                {
+                                    left.Item()
+                                        .Text("Certificate Number")
+                                        .FontSize(11)
+                                        .SemiBold()
+                                        .FontColor(Colors.Grey.Darken2);
+                                    left.Item()
+                                        .Text(certificateNumber)
+                                        .FontSize(12)
+                                        .FontColor(Colors.Black);
+                                });
+
+                            row.RelativeItem()
+                                .AlignRight()
+                                .Column(right =>
+                                {
+                                    right.Item()
+                                        .Text("Issued Date")
+                                        .FontSize(11)
+                                        .SemiBold()
+                                        .FontColor(Colors.Grey.Darken2);
+                                    right.Item()
+                                        .Text(issuedAt.ToString("dd MMM yyyy"))
+                                        .FontSize(12)
+                                        .FontColor(Colors.Black);
+                                });
+                        });
+
+                        column.Item()
+                            .PaddingTop(8)
                             .AlignCenter()
                             .Text($"Issued by {OrganizationName}")
-                            .FontSize(16)
+                            .FontSize(13)
                             .Italic()
                             .FontColor(Colors.Grey.Darken2);
                     });
