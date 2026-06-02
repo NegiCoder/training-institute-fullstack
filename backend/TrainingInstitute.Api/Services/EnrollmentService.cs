@@ -10,10 +10,14 @@ namespace TrainingInstitute.Api.Services;
 public class EnrollmentService : IEnrollmentService
 {
     private readonly TrainingInstituteDbContext _context;
+    private readonly INotificationService _notificationService;
 
-    public EnrollmentService(TrainingInstituteDbContext context)
+    public EnrollmentService(
+        TrainingInstituteDbContext context,
+        INotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     public async Task<EnrollmentResponse> CreateMyEnrollmentAsync(int userId, CreateEnrollmentRequest request)
@@ -150,6 +154,11 @@ public class EnrollmentService : IEnrollmentService
             return null;
         }
 
+        var previousStatus = enrollment.Status;
+        // Snapshot the progress BEFORE the completion branch overwrites it to 100,
+        // otherwise the "manual completion" trainer notification below is unreachable.
+        var previousProgress = enrollment.ProgressPercentage;
+
         enrollment.Status = request.Status;
         enrollment.UpdatedAt = DateTime.UtcNow;
         enrollment.UpdatedBy = adminUserId;
@@ -162,6 +171,26 @@ public class EnrollmentService : IEnrollmentService
         }
 
         await _context.SaveChangesAsync();
+
+        // Trainer ko notify sirf tab karna hai jab progress 100 nahi tha
+        // (agar 100 tha to module-progress flow se already notify ho chuka)
+        // Ye case rare hai - admin manually status flip kar raha hai bina modules complete kiye
+        if (previousStatus != EnrollmentStatus.Completed
+            && request.Status == EnrollmentStatus.Completed
+            && previousProgress < 100)
+        {
+            var studentName = enrollment.Student == null
+                ? "A student"
+                : $"{enrollment.Student.FirstName} {enrollment.Student.LastName}".Trim();
+            var courseTitle = enrollment.Course?.Title ?? "their course";
+
+            await _notificationService.CreateForCourseTrainersAsync(
+                enrollment.CourseId,
+                NotificationTypes.CourseCompleted,
+                "Course marked complete",
+                $"Admin marked {studentName} as complete for \"{courseTitle}\".",
+                "/trainer/students");
+        }
 
         return MapToResponse(enrollment);
     }

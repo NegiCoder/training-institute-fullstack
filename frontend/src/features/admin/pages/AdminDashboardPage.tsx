@@ -90,6 +90,7 @@ export function AdminDashboardPage() {
             <Link to="/admin/students">View Students</Link>
             <Link to="/admin/enrollments">Manage Enrollments</Link>
             <Link to="/admin/certificates">Issue Certificates</Link>
+            <Link to="/admin/reports">View Reports</Link>
           </div>
         </>
       )}

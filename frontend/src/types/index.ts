@@ -48,6 +48,23 @@ export type {
   StudentModuleProgressResponse,
 } from '@/types/progress'
 export type {
+  CategoryPerformanceResponse,
+  CoursePerformanceResponse,
+  EnrollmentTrendPointResponse,
+  IdleStudentResponse,
+  ReportsOverviewResponse,
+  StudentEngagementResponse,
+  TopCourseMetric,
+  TopCourseResponse,
+  TopStudentResponse,
+  TrainerPerformanceResponse,
+} from '@/types/report'
+export type {
+  NotificationResponse,
+  NotificationUnreadCount,
+} from '@/types/notification'
+export { NotificationTypes } from '@/types/notification'
+export type {
   CreateStudentProfileRequest,
   StudentProfileResponse,
   StudentSearchRequest,

@@ -183,7 +183,7 @@ DELETE FROM CourseTrainers;
 DELETE FROM CourseContents;
 DELETE FROM CoursePricings;
 DELETE FROM Students;
-DELETE FROM AdminNotifications;
+DELETE FROM Notifications;
 DELETE FROM Courses;
 DELETE FROM CourseCategories;
 DELETE FROM Users;
@@ -194,7 +194,7 @@ DBCC CHECKIDENT ('CourseTrainers', RESEED, 0);
 DBCC CHECKIDENT ('CourseContents', RESEED, 0);
 DBCC CHECKIDENT ('CoursePricings', RESEED, 0);
 DBCC CHECKIDENT ('Students', RESEED, 0);
-DBCC CHECKIDENT ('AdminNotifications', RESEED, 0);
+DBCC CHECKIDENT ('Notifications', RESEED, 0);
 DBCC CHECKIDENT ('Courses', RESEED, 0);
 DBCC CHECKIDENT ('CourseCategories', RESEED, 0);
 DBCC CHECKIDENT ('Users', RESEED, 0);
@@ -447,7 +447,8 @@ UNION ALL SELECT 'Modules',          COUNT(*) FROM CourseContents
 UNION ALL SELECT 'Trainer Links',    COUNT(*) FROM CourseTrainers
 UNION ALL SELECT 'Enrollments',      COUNT(*) FROM CourseEnrollments
 UNION ALL SELECT 'Module Progress',  COUNT(*) FROM StudentModuleProgress
-UNION ALL SELECT 'Certificates',     COUNT(*) FROM CertificateIssued;
+UNION ALL SELECT 'Certificates',     COUNT(*) FROM CertificateIssued
+UNION ALL SELECT 'Notifications',    COUNT(*) FROM Notifications;
 "
 
 echo

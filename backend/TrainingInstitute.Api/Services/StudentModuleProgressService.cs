@@ -9,10 +9,14 @@ namespace TrainingInstitute.Api.Services;
 public class StudentModuleProgressService : IStudentModuleProgressService
 {
     private readonly TrainingInstituteDbContext _context;
+    private readonly INotificationService _notificationService;
 
-    public StudentModuleProgressService(TrainingInstituteDbContext context)
+    public StudentModuleProgressService(
+        TrainingInstituteDbContext context,
+        INotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     public async Task<StudentModuleProgressResponse> MarkModuleCompleteAsync(int userId, MarkModuleCompleteRequest request)
@@ -105,6 +109,8 @@ public class StudentModuleProgressService : IStudentModuleProgressService
 
     private async Task<int> RecalculateProgressAsync(CourseEnrollment enrollment)
     {
+        var previousProgress = enrollment.ProgressPercentage;
+
         var totalModules = await _context.CourseContents
             .CountAsync(c => c.CourseId == enrollment.CourseId && c.IsActive);
 
@@ -129,7 +135,40 @@ public class StudentModuleProgressService : IStudentModuleProgressService
 
         await _context.SaveChangesAsync();
 
+        // student abhi-abhi 100% pe pahuncha hai - trainer + admin ko notify karenge
+        // (status hum yahan auto-complete nahi karte - admin ka approval chahiye)
+        if (previousProgress < 100 && progressPercentage == 100)
+        {
+            await NotifyOnAutoCompletionAsync(enrollment);
+        }
+
         return progressPercentage;
+    }
+
+    private async Task NotifyOnAutoCompletionAsync(CourseEnrollment enrollment)
+    {
+        var studentName = enrollment.Student == null
+            ? "A student"
+            : $"{enrollment.Student.FirstName} {enrollment.Student.LastName}".Trim();
+
+        // course title ke liye explicit fetch - enrollment.Course Include nahi hua
+        var courseTitle = await _context.Courses
+            .Where(c => c.CourseId == enrollment.CourseId)
+            .Select(c => c.Title)
+            .FirstOrDefaultAsync() ?? "their course";
+
+        await _notificationService.CreateForCourseTrainersAsync(
+            enrollment.CourseId,
+            NotificationTypes.CourseCompleted,
+            "Student completed all modules",
+            $"{studentName} has finished every module of \"{courseTitle}\".",
+            "/trainer/students");
+
+        await _notificationService.CreateForAdminsAsync(
+            NotificationTypes.CourseCompleted,
+            "Action needed: confirm course completion",
+            $"{studentName} has finished every module of \"{courseTitle}\". Please mark the enrollment complete and issue a certificate.",
+            "/admin/enrollments");
     }
 
     private static StudentModuleProgressResponse MapToResponse(StudentModuleProgress progress, int progressPercentage)

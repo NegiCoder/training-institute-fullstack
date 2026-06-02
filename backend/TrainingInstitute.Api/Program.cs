@@ -26,6 +26,8 @@ builder.Services.AddScoped<ICourseTrainerService, CourseTrainerService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IStudentModuleProgressService, StudentModuleProgressService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 // Jwt settings bind
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
@@ -35,6 +37,19 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.Configure<CertificateStorageSettings>(builder.Configuration.GetSection("CertificateStorage"));
 builder.Services.AddScoped<ICertificatePdfGenerator, CertificatePdfGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Pick certificate storage backend at startup based on configuration.
+// If a blob connection string is supplied, use Azure Blob; otherwise fall
+// back to the local-disk implementation (dev/demo).
+var certStorageConnection = builder.Configuration["CertificateStorage:BlobConnectionString"];
+if (!string.IsNullOrWhiteSpace(certStorageConnection))
+{
+    builder.Services.AddScoped<ICertificateStorage, BlobCertificateStorage>();
+}
+else
+{
+    builder.Services.AddScoped<ICertificateStorage, LocalCertificateStorage>();
+}
 
 builder.Services.AddCors(options =>
 {

@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using TrainingInstitute.Api.Configuration;
 using TrainingInstitute.Api.Data;
 using TrainingInstitute.Api.DTOs.Certificates;
 using TrainingInstitute.Api.DTOs.Common;
@@ -14,18 +12,21 @@ public class CertificateService : ICertificateService
     private readonly TrainingInstituteDbContext _context;
     private readonly ICertificatePdfGenerator _pdfGenerator;
     private readonly IEmailService _emailService;
-    private readonly CertificateStorageSettings _storageSettings;
+    private readonly INotificationService _notificationService;
+    private readonly ICertificateStorage _storage;
 
     public CertificateService(
         TrainingInstituteDbContext context,
         ICertificatePdfGenerator pdfGenerator,
         IEmailService emailService,
-        IOptions<CertificateStorageSettings> storageOptions)
+        INotificationService notificationService,
+        ICertificateStorage storage)
     {
         _context = context;
         _pdfGenerator = pdfGenerator;
         _emailService = emailService;
-        _storageSettings = storageOptions.Value;
+        _notificationService = notificationService;
+        _storage = storage;
     }
 
     public async Task<CertificateResponse> IssueCertificateAsync(int adminUserId, IssueCertificateRequest request)
@@ -78,18 +79,14 @@ public class CertificateService : ICertificateService
 
 
         var fileName = $"{certificateNumber}.pdf";
-        var fullPath = Path.Combine(_storageSettings.Folder, fileName);
-        Directory.CreateDirectory(_storageSettings.Folder);
-        await File.WriteAllBytesAsync(fullPath, pdfBytes);
-
-        var publicPath = $"{_storageSettings.PublicBaseUrl.TrimEnd('/')}/{fileName}";
+        var storedPath = await _storage.SaveAsync(fileName, pdfBytes);
 
         var certificate = new CertificateIssued
         {
             CourseEnrollmentId = enrollment.CourseEnrollmentId,
             CertificateNumber = certificateNumber,
             IssuedAt = DateTime.UtcNow,
-            PdfPath = publicPath,
+            PdfPath = storedPath,
             EmailStatus = CertificateEmailStatus.Pending,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = adminUserId
@@ -128,6 +125,15 @@ public class CertificateService : ICertificateService
             .Include(c => c.Enrollment)
                 .ThenInclude(e => e!.Course)
             .FirstAsync(c => c.CertificateIssuedId == certificate.CertificateIssuedId);
+
+        // admins ko certificate-issued notification (audit trail)
+        // Trainer ko yahan notify nahi karte - wo module-completion flow ya
+        // manual status-change flow se already notified hai
+        await _notificationService.CreateForAdminsAsync(
+            NotificationTypes.CertificateIssued,
+            "Certificate generated",
+            $"Certificate {certificateNumber} issued to {studentName} for \"{courseTitle}\".",
+            "/admin/certificates");
 
         return MapToResponse(createdCertificate);
     }
@@ -245,14 +251,12 @@ public class CertificateService : ICertificateService
         }
 
         var fileName = $"{certificate.CertificateNumber}.pdf";
-        var fullPath = Path.Combine(_storageSettings.Folder, fileName);
+        var bytes = await _storage.ReadAsync(fileName);
 
-        if (!File.Exists(fullPath))
+        if (bytes == null)
         {
             return null;
         }
-
-        var bytes = await File.ReadAllBytesAsync(fullPath);
 
         return new CertificateDownloadResult
         {

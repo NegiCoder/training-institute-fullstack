@@ -8,6 +8,7 @@ import { AdminCreateAdminPage } from '@/features/admin/pages/AdminCreateAdminPag
 import { AdminCreateTrainerPage } from '@/features/admin/pages/AdminCreateTrainerPage'
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage'
 import { AdminEnrollmentsPage } from '@/features/admin/pages/AdminEnrollmentsPage'
+import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage'
 import { AdminStudentsPage } from '@/features/admin/pages/AdminStudentsPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -25,6 +26,7 @@ import { CourseCatalogPage } from '@/pages/CourseCatalogPage'
 import { CourseDetailPage } from '@/pages/CourseDetailPage'
 import { HomePage } from '@/pages/HomePage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
+import { NotificationsPage } from '@/pages/NotificationsPage'
 import { GuestRoute } from '@/routes/GuestRoute'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { RoleRoute } from '@/routes/RoleRoute'
@@ -43,6 +45,8 @@ export function AppRoutes() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
+          <Route path="/notifications" element={<NotificationsPage />} />
+
           <Route element={<RoleRoute allowedRoles={['Admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route
@@ -60,6 +64,7 @@ export function AppRoutes() {
             <Route path="/admin/students" element={<AdminStudentsPage />} />
             <Route path="/admin/enrollments" element={<AdminEnrollmentsPage />} />
             <Route path="/admin/certificates" element={<AdminCertificatesPage />} />
+            <Route path="/admin/reports" element={<AdminReportsPage />} />
           </Route>
 
           <Route element={<RoleRoute allowedRoles={['Student']} />}>

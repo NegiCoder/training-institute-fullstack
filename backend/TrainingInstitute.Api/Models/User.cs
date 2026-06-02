@@ -35,6 +35,6 @@ public class User
     // trainer kis kis course me hai - join table ki rows
     public ICollection<CourseTrainer> TrainerCourseLinks { get; set; } = new List<CourseTrainer>();
 
-    // admin ki notifications - ForUserId null hua to sab admin ko milegi
-    public ICollection<AdminNotification> AdminNotifications { get; set; } = new List<AdminNotification>();
+    // in-app notifications jo is user ke liye banayi gayi hain
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

@@ -34,7 +34,7 @@ public class TrainingInstituteDbContext : DbContext
 
     public DbSet<CertificateIssued> CertificateIssued { get; set; }
 
-    public DbSet<AdminNotification> AdminNotifications { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
 
 
@@ -62,6 +62,27 @@ public class TrainingInstituteDbContext : DbContext
             .HasForeignKey(p => p.CourseContentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // notifications - har user ki apni queue, unread filter ke liye index
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Notification>()
+            .HasIndex(n => new { n.UserId, n.IsRead });
+
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasMaxLength(64);
+
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.Title)
+            .HasMaxLength(200);
+
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.Link)
+            .HasMaxLength(500);
     }
 
 
