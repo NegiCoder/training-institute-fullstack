@@ -347,7 +347,7 @@ public class ReportService : IReportService
     }
 
     public async Task<StudentEngagementResponse> GetStudentEngagementAsync(
-        int idleDays = 30,
+        int idleDays = 60,
         int limit = 10)
     {
         var safeLimit = Math.Clamp(limit, 1, 50);
@@ -531,7 +531,7 @@ public class ReportService : IReportService
         return builder.ToString();
     }
 
-    public async Task<string> GetStudentEngagementCsvAsync(int idleDays = 30, int limit = 10)
+    public async Task<string> GetStudentEngagementCsvAsync(int idleDays = 60, int limit = 10)
     {
         var data = await GetStudentEngagementAsync(idleDays, limit);
         var builder = new StringBuilder();

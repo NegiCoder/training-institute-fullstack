@@ -68,7 +68,7 @@ export const reportService = {
   },
 
   async getStudentEngagement(
-    idleDays = 30,
+    idleDays = 60,
     limit = 10,
   ): Promise<StudentEngagementResponse> {
     const response = await apiClient.get<StudentEngagementResponse>(
@@ -120,7 +120,7 @@ export const reportService = {
     return response.data as Blob
   },
 
-  async downloadStudentEngagementCsv(idleDays = 30, limit = 10): Promise<Blob> {
+  async downloadStudentEngagementCsv(idleDays = 60, limit = 10): Promise<Blob> {
     const response = await apiClient.get('/api/reports/student-engagement.csv', {
       params: { idleDays, limit },
       responseType: 'blob',

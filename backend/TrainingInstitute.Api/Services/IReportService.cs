@@ -17,7 +17,7 @@ public interface IReportService
     Task<List<CategoryPerformanceResponse>> GetCategoryPerformanceAsync();
 
     Task<StudentEngagementResponse> GetStudentEngagementAsync(
-        int idleDays = 30,
+        int idleDays = 60,
         int limit = 10);
 
     Task<string> GetCoursePerformanceCsvAsync();
@@ -30,5 +30,5 @@ public interface IReportService
 
     Task<string> GetCategoryPerformanceCsvAsync();
 
-    Task<string> GetStudentEngagementCsvAsync(int idleDays = 30, int limit = 10);
+    Task<string> GetStudentEngagementCsvAsync(int idleDays = 60, int limit = 10);
 }

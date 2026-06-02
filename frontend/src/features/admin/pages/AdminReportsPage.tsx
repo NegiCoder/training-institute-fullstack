@@ -179,7 +179,7 @@ export function AdminReportsPage() {
           reportService.getEnrollmentTrend(trendRange),
           reportService.getTrainerPerformance(),
           reportService.getCategoryPerformance(),
-          reportService.getStudentEngagement(30, 10),
+          reportService.getStudentEngagement(60, 10),
         ])
 
         setOverview(overviewResult)
@@ -820,7 +820,7 @@ export function AdminReportsPage() {
                   <h2>Student Engagement</h2>
                   <p>
                     Top students by certificates earned and students with no enrollment
-                    in the last 30 days.
+                    in the last 60 days.
                   </p>
                 </div>
                 <button
@@ -830,7 +830,7 @@ export function AdminReportsPage() {
                   onClick={() =>
                     void runExport(
                       'engagement',
-                      () => reportService.downloadStudentEngagementCsv(30, 10),
+                      () => reportService.downloadStudentEngagementCsv(60, 10),
                       'student-engagement',
                     )
                   }
@@ -866,7 +866,7 @@ export function AdminReportsPage() {
                 <div className="engagement-card">
                   <h3>Idle Students</h3>
                   <p className="muted small-text">
-                    No new enrollment in the last 30 days.
+                    No new enrollment in the last 60 days.
                   </p>
 
                   {studentEngagement.idleStudents.length === 0 ? (

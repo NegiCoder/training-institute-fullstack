@@ -68,7 +68,7 @@ public class ReportsController : ControllerBase
 
     [HttpGet("student-engagement")]
     public async Task<IActionResult> GetStudentEngagement(
-        [FromQuery] int idleDays = 30,
+        [FromQuery] int idleDays = 60,
         [FromQuery] int limit = 10)
     {
         var report = await _reportService.GetStudentEngagementAsync(idleDays, limit);
@@ -119,7 +119,7 @@ public class ReportsController : ControllerBase
 
     [HttpGet("student-engagement.csv")]
     public async Task<IActionResult> DownloadStudentEngagementCsv(
-        [FromQuery] int idleDays = 30,
+        [FromQuery] int idleDays = 60,
         [FromQuery] int limit = 10)
     {
         var csv = await _reportService.GetStudentEngagementCsvAsync(idleDays, limit);

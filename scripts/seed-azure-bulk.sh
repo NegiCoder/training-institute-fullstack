@@ -4,14 +4,14 @@
 # =============================================================================
 # What it does:
 #   - 1 admin (must already exist + be promoted to Role=3 in DB)
-#   - 12 trainers (created via admin)
-#   - 100 students (registered + full profiles)
-#   - 8 categories
-#   - 60 courses with pricing, modules and trainer assignments
+#   - 15 trainers (created via admin)
+#   - 150 students (registered + full profiles)
+#   - 10 categories
+#   - 80 courses with pricing, modules and trainer assignments
 #       * every course has a 2026 pricing row (~30% Free, rest Paid)
 #       * many courses also have a 2025 historical pricing row
 #       * a few Draft courses for testing draft visibility
-#   - ~300 enrollments distributed across students
+#   - ~600 enrollments distributed with demo-friendly variance
 #   - Module progress for many enrollments
 #   - Status lifecycle moves and a handful of certificates
 #
@@ -30,8 +30,9 @@ set -euo pipefail
 
 API="${API:-http://localhost:5045}"
 
-NUM_TRAINERS=12
-NUM_STUDENTS=100
+NUM_TRAINERS=15
+NUM_STUDENTS=150
+TARGET_CERTIFICATES=25
 
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@training.local}"
 ADMIN_PASS="${ADMIN_PASS:-Admin@12345}"
@@ -201,8 +202,8 @@ COLLEGES=("PICT" "VJTI" "RVCE" "JNTU" "DTU" "NIT Trichy" "IIT Delhi" \
 
 PASSOUT_YEARS=(2022 2023 2024 2025 2026)
 
-TRAINER_FIRST=(Aman Priya Rahul Kavita Vikram Neha Suresh Anjali Deepak Pooja Manish Divya)
-TRAINER_LAST=(Sharma Iyer Mehta Khanna Singh Verma Reddy Nair Joshi Gupta Pant Saxena)
+TRAINER_FIRST=(Aman Priya Rahul Kavita Vikram Neha Suresh Anjali Deepak Pooja Manish Divya Rohan Meera Arjun)
+TRAINER_LAST=(Sharma Iyer Mehta Khanna Singh Verma Reddy Nair Joshi Gupta Pant Saxena Kapoor Bose Malhotra)
 
 # ---------- step 0: sanity check --------------------------------------------
 
@@ -265,7 +266,7 @@ ok "All $NUM_STUDENTS students created"
 
 # ---------- step 4: categories ----------------------------------------------
 
-hdr "Step 4: Creating 8 categories"
+hdr "Step 4: Creating 10 categories"
 CAT_PROG=$(create_category   "Programming"      "$ADMIN_TOKEN")
 CAT_WEB=$(create_category    "Web Development"  "$ADMIN_TOKEN")
 CAT_DATA=$(create_category   "Data Science"     "$ADMIN_TOKEN")
@@ -274,11 +275,13 @@ CAT_MOB=$(create_category    "Mobile"           "$ADMIN_TOKEN")
 CAT_AI=$(create_category     "AI / ML"          "$ADMIN_TOKEN")
 CAT_SEC=$(create_category    "Cybersecurity"    "$ADMIN_TOKEN")
 CAT_DB=$(create_category     "Database"         "$ADMIN_TOKEN")
+CAT_QA=$(create_category     "Software Testing" "$ADMIN_TOKEN")
+CAT_PRODUCT=$(create_category "Product & Design" "$ADMIN_TOKEN")
 ok "Categories created"
 
-# ---------- step 5: 60 courses + pricing + modules + trainer assignments ----
+# ---------- step 5: courses + pricing + modules + trainer assignments --------
 
-hdr "Step 5: Creating 60 courses (pricing + modules + trainers)"
+hdr "Step 5: Creating courses (pricing + modules + trainers)"
 
 # status: 1=Draft, 2=Published, 3=Archived
 # contentType: 1=Video, 2=Pdf, 3=Link
@@ -350,6 +353,30 @@ declare -a COURSES=(
 "$CAT_DB|PostgreSQL Deep Dive|Advanced indexing, partitioning, JSONB and performance.|Intermediate|Online|5 weeks|2|false"
 "$CAT_DB|Redis for Real-Time Apps|Caching strategies, pub/sub, streams and Lua scripting.|Intermediate|Online|3 weeks|2|true"
 "$CAT_DB|Elasticsearch and OpenSearch|Indexing, querying, analyzers and observability stacks.|Advanced|Online|5 weeks|2|false"
+
+"$CAT_QA|Manual Testing Foundations|Test cases, bug reports, test plans and practical QA workflows.|Beginner|Online|4 weeks|2|true"
+"$CAT_QA|Selenium Automation with Java|Browser automation, waits, Page Object Model and reporting.|Intermediate|Online|6 weeks|2|true"
+"$CAT_QA|Cypress End to End Testing|Modern frontend testing with Cypress, fixtures and CI runs.|Intermediate|Online|5 weeks|2|false"
+"$CAT_QA|Playwright Test Automation|Cross-browser automation, traces, screenshots and parallel runs.|Intermediate|Online|5 weeks|2|true"
+"$CAT_QA|API Testing with Postman|Collections, environments, monitors and contract validation.|Beginner|Online|4 weeks|2|false"
+"$CAT_QA|Performance Testing with JMeter|Load testing, thread groups, assertions and bottleneck analysis.|Intermediate|Hybrid|5 weeks|2|false"
+"$CAT_QA|Mobile App Testing|Device testing, emulator strategy, crash reports and release checks.|Beginner|Online|4 weeks|2|false"
+"$CAT_QA|QA Lead Practical Program|Test strategy, metrics, stakeholder reporting and release quality gates.|Advanced|Hybrid|8 weeks|2|false"
+"$CAT_QA|Security Testing Basics|Threat modeling, common vulnerabilities and security test checklists.|Intermediate|Online|5 weeks|2|false"
+"$CAT_QA|Automation Framework Design|Reusable test frameworks, reporting and CI/CD integration.|Advanced|Online|6 weeks|1|false"
+
+"$CAT_PRODUCT|UI UX Design Foundations|User research, wireframes, design systems and usability testing.|Beginner|Online|5 weeks|2|true"
+"$CAT_PRODUCT|Figma for Product Designers|Auto layout, components, variants, prototyping and handoff.|Beginner|Online|4 weeks|2|true"
+"$CAT_PRODUCT|Product Management Basics|Roadmaps, discovery, prioritization and stakeholder communication.|Beginner|Online|5 weeks|2|false"
+"$CAT_PRODUCT|Agile Scrum Master Prep|Scrum ceremonies, estimation, velocity and team facilitation.|Intermediate|Hybrid|4 weeks|2|false"
+"$CAT_PRODUCT|Business Analysis Practical|Requirements, user stories, process maps and acceptance criteria.|Beginner|Online|5 weeks|2|false"
+"$CAT_PRODUCT|Digital Marketing Analytics|Campaign metrics, funnels, attribution and dashboard reporting.|Intermediate|Online|5 weeks|2|false"
+"$CAT_PRODUCT|No-Code MVP Building|Build quick prototypes using no-code tools and automation.|Beginner|Online|3 weeks|2|false"
+"$CAT_PRODUCT|Technical Writing for Software|API docs, user guides, release notes and structured documentation.|Beginner|Online|4 weeks|2|false"
+"$CAT_PRODUCT|Product Analytics with SQL|Activation, retention, cohorts and product metric analysis.|Intermediate|Online|5 weeks|2|true"
+"$CAT_PRODUCT|Design Thinking Workshop|Empathy mapping, ideation, prototyping and validation.|Beginner|Hybrid|3 weeks|2|false"
+"$CAT_PRODUCT|Growth Product Management|Experiments, onboarding, pricing and lifecycle growth loops.|Advanced|Online|6 weeks|2|false"
+"$CAT_PRODUCT|Customer Success for SaaS|Onboarding, renewals, health scores and support playbooks.|Beginner|Online|4 weeks|1|false"
 )
 
 declare -a COURSE_IDS=()
@@ -378,8 +405,13 @@ for row in "${COURSES[@]}"; do
     fi
   fi
 
-  # 1-2 trainers per course
-  T1=$((RANDOM % NUM_TRAINERS))
+  # Demo variance: first 4 trainers thode busy rahenge, baaki normal.
+  # Isse Trainer Performance report me clear difference dikhega.
+  if (( CIDX % 4 != 0 )); then
+    T1=$((CIDX % 4))
+  else
+    T1=$((4 + RANDOM % (NUM_TRAINERS - 4)))
+  fi
   assign_trainer "$COURSE_ID" "${TRAINER_IDS[$T1]}" "$ADMIN_TOKEN"
   PRIMARY_TRAINER_TOKEN="${TRAINER_TOKENS[$T1]}"
   if (( RANDOM % 3 == 0 )); then
@@ -406,14 +438,14 @@ for row in "${COURSES[@]}"; do
 
   CIDX=$((CIDX + 1))
   if (( CIDX % 10 == 0 )); then
-    ok "  Created $CIDX/60 courses..."
+    ok "  Created $CIDX/${#COURSES[@]} courses..."
   fi
 done
-ok "All 60 courses ready"
+ok "All ${#COURSES[@]} courses ready"
 
 # ---------- step 6: enrollments ---------------------------------------------
 
-hdr "Step 6: Creating enrollments (each student in 2-4 courses)"
+hdr "Step 6: Creating enrollments with hero courses, star learners and idle learners"
 
 YEAR_AGO=$(date -u -v -30d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
 TODAY=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -421,16 +453,38 @@ TWO_MONTHS=$(date -u -v +60d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '60 d
 
 declare -a ALL_ENROLLMENT_IDS=()
 declare -a ALL_ENROLLMENT_STUDENT_TOKENS=()
+declare -a ALL_ENROLLMENT_STUDENT_IDX=()
 declare -a ALL_ENROLLMENT_COURSE_IDX=()
 
 NUM_COURSES=${#COURSE_IDS[@]}
+IDLE_STUDENT_COUNT=20
+STAR_STUDENT_COUNT=20
+HERO_COURSE_INDEXES=(0 5 10 14 25)
+
 for ((s=0; s<NUM_STUDENTS; s++)); do
   STOK="${STUDENT_TOKENS[$s]}"
-  NUM_ENROLLS=$(( (RANDOM % 3) + 2 ))
+  if (( s < IDLE_STUDENT_COUNT )); then
+    # Idle students: sirf enroll honge, progress nahi karenge.
+    # Student Engagement report me ye clearly dikhte hai.
+    NUM_ENROLLS=1
+  elif (( s < IDLE_STUDENT_COUNT + STAR_STUDENT_COUNT )); then
+    # Star learners: zyada courses + high completion.
+    NUM_ENROLLS=$(( (RANDOM % 3) + 6 ))
+  else
+    # Normal learners: 3-5 courses each, enough data for reports.
+    NUM_ENROLLS=$(( (RANDOM % 3) + 3 ))
+  fi
+
   # pick distinct course indexes
   declare -a PICKED=()
   while (( ${#PICKED[@]} < NUM_ENROLLS )); do
-    IDX=$((RANDOM % NUM_COURSES))
+    if (( RANDOM % 100 < 55 )); then
+      # 5 hero courses ko extra traffic dete hai taaki Top Courses report flat na lage.
+      IDX="${HERO_COURSE_INDEXES[$((RANDOM % ${#HERO_COURSE_INDEXES[@]}))]}"
+      (( IDX >= NUM_COURSES )) && IDX=$((RANDOM % NUM_COURSES))
+    else
+      IDX=$((RANDOM % NUM_COURSES))
+    fi
     DUP=0
     for p in "${PICKED[@]:-}"; do
       [[ "$p" == "$IDX" ]] && DUP=1 && break
@@ -449,6 +503,7 @@ for ((s=0; s<NUM_STUDENTS; s++)); do
     if [[ -n "$EID" && "$EID" != "null" ]]; then
       ALL_ENROLLMENT_IDS+=("$EID")
       ALL_ENROLLMENT_STUDENT_TOKENS+=("$STOK")
+      ALL_ENROLLMENT_STUDENT_IDX+=("$s")
       ALL_ENROLLMENT_COURSE_IDX+=("$IDX")
     fi
   done
@@ -470,29 +525,54 @@ COMPLETED_ENROLLMENT_IDS=()
 for ((e=0; e<NUM_ENROLLMENTS; e++)); do
   EID="${ALL_ENROLLMENT_IDS[$e]}"
   STOK="${ALL_ENROLLMENT_STUDENT_TOKENS[$e]}"
+  SIDX="${ALL_ENROLLMENT_STUDENT_IDX[$e]}"
   CIDX="${ALL_ENROLLMENT_COURSE_IDX[$e]}"
   MODULES_STR="${COURSE_MODULE_LISTS[$CIDX]}"
   # split modules into array
   read -r -a MODULES <<< "$MODULES_STR"
   MOD_COUNT=${#MODULES[@]}
 
+  IS_HERO=0
+  for h in "${HERO_COURSE_INDEXES[@]}"; do
+    [[ "$h" == "$CIDX" ]] && IS_HERO=1 && break
+  done
+
+  if (( SIDX < IDLE_STUDENT_COUNT )); then
+    # Idle cohort: no progress. Backdate script later inko 60+ days old banayega.
+    continue
+  fi
+
   ROLL=$((RANDOM % 10))
-  if (( ROLL < 4 )); then
-    # 40% complete some modules but not all (in progress)
+  if (( SIDX < IDLE_STUDENT_COUNT + STAR_STUDENT_COUNT && ROLL < 7 )); then
+    # Star learners: mostly complete all modules.
+    for ((m=0; m<MOD_COUNT; m++)); do
+      mark_module_complete "$EID" "${MODULES[$m]}" "$STOK" || true
+    done
+    update_enrollment_status "$EID" 3 "$ADMIN_TOKEN" || true
+    COMPLETED_ENROLLMENT_IDS+=("$EID")
+  elif (( IS_HERO == 1 && ROLL < 4 )); then
+    # Hero courses: better completion rate, visually stronger reports.
+    for ((m=0; m<MOD_COUNT; m++)); do
+      mark_module_complete "$EID" "${MODULES[$m]}" "$STOK" || true
+    done
+    update_enrollment_status "$EID" 3 "$ADMIN_TOKEN" || true
+    COMPLETED_ENROLLMENT_IDS+=("$EID")
+  elif (( ROLL < 7 )); then
+    # Partial progress: in-progress learners populate average progress columns.
     DONE=$(( (RANDOM % (MOD_COUNT - 1)) + 1 ))
     for ((m=0; m<DONE; m++)); do
       mark_module_complete "$EID" "${MODULES[$m]}" "$STOK" || true
     done
     update_enrollment_status "$EID" 2 "$ADMIN_TOKEN" || true
-  elif (( ROLL < 6 )); then
-    # 20% complete all modules and mark completed
+  elif (( ROLL < 9 )); then
+    # Normal completions: enough certificates/completed rows without overdoing it.
     for ((m=0; m<MOD_COUNT; m++)); do
       mark_module_complete "$EID" "${MODULES[$m]}" "$STOK" || true
     done
     update_enrollment_status "$EID" 3 "$ADMIN_TOKEN" || true
     COMPLETED_ENROLLMENT_IDS+=("$EID")
   fi
-  # else 40% remains in initial Pending state with no progress
+  # else remains in initial Pending state with no progress
 
   if (( (e+1) % 50 == 0 )); then
     ok "  Updated progress for $((e+1))/$NUM_ENROLLMENTS enrollments..."
@@ -502,10 +582,10 @@ ok "Progress + lifecycle done. Completed: ${#COMPLETED_ENROLLMENT_IDS[@]}"
 
 # ---------- step 8: certificates -------------------------------------------
 
-hdr "Step 8: Issuing certificates for first 20 completed enrollments"
+hdr "Step 8: Issuing certificates for first $TARGET_CERTIFICATES completed enrollments"
 COUNT=0
 for EID in "${COMPLETED_ENROLLMENT_IDS[@]}"; do
-  [[ $COUNT -ge 20 ]] && break
+  [[ $COUNT -ge $TARGET_CERTIFICATES ]] && break
   if issue_certificate "$EID" "$ADMIN_TOKEN"; then
     COUNT=$((COUNT + 1))
   else
@@ -528,8 +608,11 @@ echo
 echo "  Students : (password = $STUDENT_PASS)"
 echo "             student001@training.local ... student$(printf "%03d" "$NUM_STUDENTS")@training.local"
 echo
-echo "  Categories : 8"
-echo "  Courses    : 60 (mix of Free, Paid, Published and a few Draft)"
+echo "  Categories : 10"
+echo "  Courses    : ${#COURSE_IDS[@]} (mix of Free, Paid, Published and a few Draft)"
 echo "  Enrollments: ${#ALL_ENROLLMENT_IDS[@]}"
 echo "  Certificates issued: $COUNT"
+echo
+echo "Next step:"
+echo "  Run scripts/backdate-azure.sh to spread report dates across the last 10 months."
 echo
