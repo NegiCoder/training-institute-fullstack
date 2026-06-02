@@ -47,7 +47,7 @@ public class EmailService : IEmailService
 
                 <p>Your certificate PDF is attached with this email.</p>
 
-                <p>Regards,<br/>Training Institute</p>
+                <p>Regards,<br/>ExcelGens</p>
                 """
         };
 

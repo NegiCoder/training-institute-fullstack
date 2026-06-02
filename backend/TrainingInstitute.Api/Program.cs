@@ -96,7 +96,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Training Institute API",
+        Title = "ExcelGens API",
         Version = "v1"
     });
 

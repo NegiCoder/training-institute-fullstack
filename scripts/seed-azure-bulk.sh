@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Training Institute - BULK API Seed Script (Azure / any environment)
+# ExcelGens - BULK API Seed Script (Azure / any environment)
 # =============================================================================
 # What it does:
 #   - 1 admin (must already exist + be promoted to Role=3 in DB)

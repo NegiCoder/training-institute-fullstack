@@ -1,4 +1,4 @@
-# Training Institute - End-to-End Test Guide
+# ExcelGens - End-to-End Test Guide
 
 A step-by-step manual test walkthrough that exercises **every feature** of the project — for student, trainer, and admin roles. Follow it top-down. Each section ends with an "Expected" checkbox.
 

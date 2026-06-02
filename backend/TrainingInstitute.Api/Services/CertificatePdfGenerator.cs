@@ -6,12 +6,19 @@ namespace TrainingInstitute.Api.Services;
 
 public class CertificatePdfGenerator : ICertificatePdfGenerator
 {
+    private const string OrganizationName = "ExcelGens";
+
+    // Cached so we read the logo file from disk only once per process lifetime
+    private static readonly Lazy<byte[]?> LogoBytes = new(LoadLogo);
+
     public byte[] GenerateCertificatePdf(
         string studentName,
         string courseTitle,
         string certificateNumber,
         DateTime issuedAt)
     {
+        var logo = LogoBytes.Value;
+
         return Document.Create(container =>
         {
             container.Page(page =>
@@ -27,7 +34,29 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                     .Padding(40)
                     .Column(column =>
                     {
-                        column.Spacing(25);
+                        column.Spacing(20);
+
+                        // Header: logo + org name
+                        column.Item().Row(headerRow =>
+                        {
+                            if (logo != null)
+                            {
+                                headerRow.AutoItem()
+                                    .Width(70)
+                                    .Height(70)
+                                    .Image(logo)
+                                    .FitArea();
+
+                                headerRow.ConstantItem(15);
+                            }
+
+                            headerRow.RelativeItem()
+                                .AlignMiddle()
+                                .Text(OrganizationName)
+                                .FontSize(28)
+                                .Bold()
+                                .FontColor(Colors.Blue.Darken2);
+                        });
 
                         column.Item()
                             .AlignCenter()
@@ -81,13 +110,26 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                             });
 
                         column.Item()
-                            .PaddingTop(30)
+                            .PaddingTop(20)
                             .AlignCenter()
-                            .Text("Training Institute")
-                            .FontSize(20)
-                            .Bold();
+                            .Text($"Issued by {OrganizationName}")
+                            .FontSize(16)
+                            .Italic()
+                            .FontColor(Colors.Grey.Darken2);
                     });
             });
         }).GeneratePdf();
+    }
+
+    private static byte[]? LoadLogo()
+    {
+        // wwwroot/excelgens-logo.jpeg gets shipped inside the container image.
+        // Returning null is safe - the PDF will render without the logo.
+        var logoPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "wwwroot",
+            "excelgens-logo.jpeg");
+
+        return File.Exists(logoPath) ? File.ReadAllBytes(logoPath) : null;
     }
 }

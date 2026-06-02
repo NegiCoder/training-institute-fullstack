@@ -12,7 +12,7 @@ public class HealthController : ControllerBase
         return Ok(new
         {
             status = "Healthy",
-            service = "Training Institute API",
+            service = "ExcelGens API",
             checkedAt = DateTime.UtcNow
         });
     }

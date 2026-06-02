@@ -3,11 +3,11 @@ import { env } from '@/config/env'
 export function HomePage() {
   return (
     <section className="page-card">
-      <p className="eyebrow">Training Institute</p>
+      <p className="eyebrow">ExcelGens</p>
       <h1>Learn. Track. Certify.</h1>
       <p className="page-text">
-        This frontend will connect to your ASP.NET Core API, support role-based
-        dashboards, and manage courses, enrollments, progress, and certificates.
+        ExcelGens helps learners discover practical courses, track module progress, and
+        earn verified certificates from one simple training platform.
       </p>
 
       <div className="info-list">

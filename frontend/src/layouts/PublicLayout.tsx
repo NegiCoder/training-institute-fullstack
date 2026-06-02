@@ -12,7 +12,8 @@ export function PublicLayout() {
     <div className="public-layout">
       <header className="site-header">
         <Link className="brand" to="/">
-          Training Institute
+          <img src="/excelgens-logo.jpeg" alt="" className="brand-logo" />
+          <span>ExcelGens</span>
         </Link>
 
         <nav className="site-nav-primary" aria-label="Main navigation">
