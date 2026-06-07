@@ -32,6 +32,9 @@ import { GuestRoute } from '@/routes/GuestRoute'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { RoleRoute } from '@/routes/RoleRoute'
 
+// App ka pura routing yaha define hota hai.
+// Structure: PublicLayout (navbar+footer) ke andar saare pages.
+// Public pages sabke liye, ProtectedRoute login ke baad, RoleRoute role ke hisab se.
 export function AppRoutes() {
   return (
     <Routes>

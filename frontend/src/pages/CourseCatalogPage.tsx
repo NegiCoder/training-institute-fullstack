@@ -38,6 +38,7 @@ export function CourseCatalogPage() {
   const [isCategoryLoading, setIsCategoryLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Filter dropdown ke liye categories ek baar load karte hai
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -53,6 +54,7 @@ export function CourseCatalogPage() {
     void loadCategories()
   }, [])
 
+  // Jab bhi koi filter ya page change ho, courses dobara fetch hote hai
   useEffect(() => {
     async function loadCourses() {
       setIsLoading(true)
@@ -99,7 +101,9 @@ export function CourseCatalogPage() {
     <section className="page-card">
       <p className="eyebrow">Courses</p>
       <h1>Course Catalog</h1>
-      <p className="page-text">Browse published courses from your backend API.</p>
+      <p className="page-text">
+        Explore our published courses and find the right one for you.
+      </p>
 
       <div className="catalog-toolbar">
         <input

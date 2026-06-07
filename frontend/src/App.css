@@ -1425,3 +1425,247 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===========================================================================
+   Theme enhancements - colors, bigger logo, hero, featured, value strip
+   Ye block file ke last me hai isliye upar wale base styles ko override karta hai
+   =========================================================================== */
+
+/* Navbar logo thoda bada + saaf border */
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+}
+
+.brand {
+  font-size: 1.3rem;
+}
+
+/* Primary button ko gradient + hover lift dete hai */
+.primary-button,
+.primary-link {
+  background: var(--brand-gradient);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.primary-button:hover:not(:disabled),
+.primary-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.32);
+}
+
+.secondary-button {
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand-dark);
+  background: #eef2ff;
+}
+
+/* Course cards par hover lift - thode interactive lage */
+.course-card {
+  background: var(--surface);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  border-color: #c7d2fe;
+  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.16);
+}
+
+/* Sticky colorful navbar - scroll par upar chipka rehta hai */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+  padding: 14px 24px;
+  width: min(1200px, 100%);
+}
+
+/* ---- Home page layout ---- */
+.home {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  display: grid;
+  gap: 40px;
+}
+
+/* Hero - bada colorful welcome banner */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 48px;
+  border-radius: 28px;
+  color: #ffffff;
+  background: var(--brand-gradient);
+  box-shadow: 0 30px 70px rgba(37, 99, 235, 0.28);
+}
+
+.hero::after {
+  /* Decorative glow - top right corner me halka sa */
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+}
+
+.hero-logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+}
+
+.hero-eyebrow {
+  margin-top: 22px;
+  color: #e0e7ff;
+}
+
+.hero h1 {
+  margin: 8px 0 0;
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.hero-text {
+  margin: 20px 0 0;
+  max-width: 600px;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #eef2ff;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.hero-btn {
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero-btn-primary {
+  color: var(--brand-dark);
+  background: #ffffff;
+}
+
+.hero-btn-ghost {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Value strip - 3 chhote cards */
+.value-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.value-card {
+  padding: 28px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.06);
+}
+
+.value-icon {
+  font-size: 2rem;
+}
+
+.value-card h3 {
+  margin: 12px 0 6px;
+  color: var(--ink);
+  font-size: 1.25rem;
+}
+
+.value-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Featured section heading + link */
+.featured-section {
+  padding: 8px 0 24px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--ink);
+}
+
+.section-link {
+  color: var(--brand-dark);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding: 44px 26px;
+  }
+
+  .value-strip {
+    grid-template-columns: 1fr;
+  }
+}

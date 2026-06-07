@@ -2,6 +2,10 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AuthResponse } from '@/types'
 
+// Ye global auth store hai - logged-in user aur token poore app me yaha se milta hai.
+// persist middleware isko localStorage me save karta hai, isliye refresh par
+// user logged-in hi rehta hai.
+
 type AuthUser = {
   userId: number
   fullName: string
@@ -24,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
 
+      // Login/register success ke baad user + token save karta hai
       setAuth: (response) =>
         set({
           user: {
@@ -36,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
         }),
 
+      // Logout - sab clear, user wapas guest ban jaata hai
       logout: () =>
         set({
           user: null,

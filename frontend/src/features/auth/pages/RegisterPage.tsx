@@ -42,10 +42,12 @@ export function RegisterPage() {
     },
   })
 
+  // Form submit hone par naya student account banta hai
   async function onSubmit(values: RegisterFormValues) {
     setErrorMessage('')
 
     try {
+      // Register API - public signup hamesha Student role me banta hai
       const response = await authService.register({
         fullName: values.fullName,
         email: values.email,
@@ -53,6 +55,7 @@ export function RegisterPage() {
         role: UserRole.Student,
       })
 
+      // Register ke turant baad auto-login - token store me save kar dete hai
       setAuth(response)
       navigate(getDashboardPathByRole(response.role), { replace: true })
     } catch (error) {
@@ -62,11 +65,10 @@ export function RegisterPage() {
 
   return (
     <section className="page-card narrow-card">
-      <p className="eyebrow">Authentication</p>
-      <h1>Register</h1>
+      <p className="eyebrow">Get Started</p>
+      <h1>Create your account</h1>
       <p className="page-text">
-        Create a student account. This form calls
-        <strong> POST /api/auth/register</strong>.
+        Join ExcelGens for free and start learning job-ready skills today.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>

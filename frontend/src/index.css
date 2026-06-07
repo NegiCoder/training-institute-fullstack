@@ -7,8 +7,26 @@
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  color: #0f172a;
-  background: #eff6ff;
+
+  /* Brand colors ek hi jagah - poore app me yahi se use hote hai */
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --accent: #4f46e5;
+  --accent-dark: #4338ca;
+  --ink: #0f172a;
+  --muted: #475569;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #dbe3ef;
+  --brand-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+
+  color: var(--ink);
+  /* Halka sa color wash - plain white ki jagah thoda lively background */
+  background:
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.16), transparent 38rem),
+    radial-gradient(circle at 100% 0%, rgba(79, 70, 229, 0.14), transparent 40rem),
+    #eef2ff;
+  background-attachment: fixed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

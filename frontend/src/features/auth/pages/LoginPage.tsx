@@ -16,6 +16,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
+  // Success/error message UI ke liye, aur auth store me login ke baad data save hota hai
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const setAuth = useAuthStore((state) => state.setAuth)
@@ -33,29 +34,31 @@ export function LoginPage() {
     },
   })
 
+  // Form submit hone par backend ko login call jaata hai
   async function onSubmit(values: LoginFormValues) {
     setSuccessMessage('')
     setErrorMessage('')
 
     try {
+      // Login API - token + user info wapas aata hai
       const response = await authService.login(values)
+      // Token aur user ko global store me save kar dete hai
       setAuth(response)
-      setSuccessMessage(
-        `Logged in as ${response.fullName} (${response.role}). Token saved.`,
-      )
+      setSuccessMessage(`Welcome back, ${response.fullName}!`)
+      // Role ke hisab se uske dashboard par bhej dete hai
       navigate(getDashboardPathByRole(response.role), { replace: true })
     } catch (error) {
+      // Galat password / server error - friendly message dikha do
       setErrorMessage(getApiErrorMessage(error))
     }
   }
 
   return (
     <section className="page-card narrow-card">
-      <p className="eyebrow">Authentication</p>
-      <h1>Login</h1>
+      <p className="eyebrow">Sign In</p>
+      <h1>Welcome back</h1>
       <p className="page-text">
-        Enter your email and password. This form calls your backend endpoint:
-        <strong> POST /api/auth/login</strong>.
+        Sign in to continue learning and track your course progress.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
