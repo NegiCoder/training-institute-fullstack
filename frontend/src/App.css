@@ -1431,16 +1431,17 @@
    Ye block file ke last me hai isliye upar wale base styles ko override karta hai
    =========================================================================== */
 
-/* Navbar logo thoda bada + saaf border */
+/* Navbar logo - ab bada aur clearly visible */
 .brand-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
 }
 
 .brand {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  gap: 12px;
 }
 
 /* Primary button ko gradient + hover lift dete hai */
@@ -1539,18 +1540,8 @@
   max-width: 680px;
 }
 
-.hero-logo {
-  width: 84px;
-  height: 84px;
-  border-radius: 20px;
-  object-fit: contain;
-  background: #ffffff;
-  padding: 8px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
-}
-
 .hero-eyebrow {
-  margin-top: 22px;
+  margin-top: 0;
   color: #e0e7ff;
 }
 

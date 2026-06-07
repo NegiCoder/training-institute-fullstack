@@ -59,7 +59,6 @@ export function HomePage() {
       {/* Hero - sabse upar wala colorful welcome section */}
       <section className="hero">
         <div className="hero-content">
-          <img src="/excelgens-logo.jpeg" alt="ExcelGens" className="hero-logo" />
           <p className="eyebrow hero-eyebrow">Welcome to ExcelGens</p>
           <h1>Learn. Track. Certify.</h1>
           <p className="hero-text">
