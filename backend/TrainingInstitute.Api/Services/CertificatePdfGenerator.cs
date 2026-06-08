@@ -39,20 +39,23 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
             container.Page(page =>
             {
                 page.Size(PageSizes.A4.Landscape());
-                page.Margin(28);
+                page.Margin(22);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(14).FontColor(Colors.Grey.Darken4));
+                page.DefaultTextStyle(x => x.FontSize(13).FontColor(Colors.Grey.Darken4));
 
+                // IMPORTANT: sab content ek hi page me fit hona chahiye.
+                // Pehle QR + bade fonts ke karan content page 2 par chala jaata tha.
+                // Isliye fonts/spacing/padding thode compact kar diye hai.
                 page.Content()
                     .Border(2)
                     .BorderColor(Colors.Blue.Darken3)
-                    .Padding(6)
+                    .Padding(4)
                     .Border(1)
                     .BorderColor(Colors.Yellow.Darken2)
-                    .Padding(24)
+                    .Padding(16)
                     .Column(column =>
                     {
-                        column.Spacing(12);
+                        column.Spacing(7);
 
                         // Header: sirf logo dikhate hai. Logo ke saath wapas
                         // "ExcelGens" likhna messy lagta tha, isliye hata diya.
@@ -62,8 +65,8 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                             {
                                 if (logo != null)
                                 {
-                                    header.Width(78)
-                                        .Height(78)
+                                    header.Width(60)
+                                        .Height(60)
                                         .Image(logo)
                                         .FitArea();
                                 }
@@ -71,7 +74,7 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                                 {
                                     // Logo missing case - text fallback rakha hai
                                     header.Text(OrganizationName)
-                                        .FontSize(26)
+                                        .FontSize(24)
                                         .Bold()
                                         .FontColor(Colors.Blue.Darken2);
                                 }
@@ -80,63 +83,63 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                         column.Item()
                             .AlignCenter()
                             .Text("Professional Learning · Verified Certificate")
-                            .FontSize(11)
+                            .FontSize(10)
                             .FontColor(Colors.Grey.Darken1);
 
                         column.Item()
-                            .PaddingVertical(2)
+                            .PaddingVertical(1)
                             .LineHorizontal(1)
                             .LineColor(Colors.Yellow.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text("Certificate of Completion")
-                            .FontSize(34)
+                            .FontSize(28)
                             .Bold()
                             .FontColor(Colors.Blue.Darken3);
 
                         column.Item()
                             .AlignCenter()
                             .Text("This certificate is proudly presented to")
-                            .FontSize(15)
+                            .FontSize(13)
                             .Italic()
                             .FontColor(Colors.Grey.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text(studentName)
-                            .FontSize(31)
+                            .FontSize(26)
                             .Bold()
                             .FontColor(Colors.Black);
 
                         column.Item()
                             .AlignCenter()
-                            .Width(280)
+                            .Width(260)
                             .LineHorizontal(1)
                             .LineColor(Colors.Grey.Lighten1);
 
                         column.Item()
                             .AlignCenter()
                             .Text("for successfully completing the course")
-                            .FontSize(15)
+                            .FontSize(13)
                             .Italic()
                             .FontColor(Colors.Grey.Darken2);
 
                         column.Item()
                             .AlignCenter()
                             .Text(courseTitle)
-                            .FontSize(24)
+                            .FontSize(20)
                             .SemiBold()
                             .FontColor(Colors.Green.Darken2);
 
                         column.Item()
-                            .PaddingTop(10)
+                            .PaddingTop(6)
                             .LineHorizontal(1)
                             .LineColor(Colors.Yellow.Darken2);
 
                         // Footer ka pehla row: bayi taraf cert number+date, dayi taraf QR code.
                         column.Item()
-                            .PaddingTop(4)
+                            .PaddingTop(2)
                             .Row(row =>
                             {
                                 row.RelativeItem()
@@ -144,23 +147,23 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                                     {
                                         left.Item()
                                             .Text("Certificate Number")
-                                            .FontSize(11)
+                                            .FontSize(10)
                                             .SemiBold()
                                             .FontColor(Colors.Grey.Darken2);
                                         left.Item()
                                             .Text(certificateNumber)
-                                            .FontSize(12)
+                                            .FontSize(11)
                                             .FontColor(Colors.Black);
 
                                         left.Item()
-                                            .PaddingTop(8)
+                                            .PaddingTop(6)
                                             .Text("Issued Date")
-                                            .FontSize(11)
+                                            .FontSize(10)
                                             .SemiBold()
                                             .FontColor(Colors.Grey.Darken2);
                                         left.Item()
                                             .Text(issuedAt.ToString("dd MMM yyyy"))
-                                            .FontSize(12)
+                                            .FontSize(11)
                                             .FontColor(Colors.Black);
                                     });
 
@@ -168,28 +171,28 @@ public class CertificatePdfGenerator : ICertificatePdfGenerator
                                 // verify URL configured ho.
                                 if (qrCode != null)
                                 {
-                                    row.ConstantItem(100)
+                                    row.ConstantItem(84)
                                         .Column(right =>
                                         {
                                             right.Item()
-                                                .Width(90)
-                                                .Height(90)
+                                                .Width(72)
+                                                .Height(72)
                                                 .Image(qrCode);
 
                                             right.Item()
                                                 .AlignCenter()
                                                 .Text("Scan to verify")
-                                                .FontSize(9)
+                                                .FontSize(8)
                                                 .FontColor(Colors.Grey.Darken1);
                                         });
                                 }
                             });
 
                         column.Item()
-                            .PaddingTop(8)
+                            .PaddingTop(4)
                             .AlignCenter()
                             .Text($"Issued by {OrganizationName}")
-                            .FontSize(13)
+                            .FontSize(12)
                             .Italic()
                             .FontColor(Colors.Grey.Darken2);
                     });

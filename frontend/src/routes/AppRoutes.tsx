@@ -5,6 +5,7 @@ import { AdminCoursePricingPage } from '@/features/admin/pages/AdminCoursePricin
 import { AdminCourseTrainersPage } from '@/features/admin/pages/AdminCourseTrainersPage'
 import { AdminCoursesPage } from '@/features/admin/pages/AdminCoursesPage'
 import { AdminCreateAdminPage } from '@/features/admin/pages/AdminCreateAdminPage'
+import { AdminCreateBusinessUserPage } from '@/features/admin/pages/AdminCreateBusinessUserPage'
 import { AdminCreateTrainerPage } from '@/features/admin/pages/AdminCreateTrainerPage'
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage'
 import { AdminEnrollmentsPage } from '@/features/admin/pages/AdminEnrollmentsPage'
@@ -54,6 +55,11 @@ export function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/notifications" element={<NotificationsPage />} />
 
+          {/* Reports dashboard - Admin aur BusinessUser dono dekh sakte hai */}
+          <Route element={<RoleRoute allowedRoles={['Admin', 'BusinessUser']} />}>
+            <Route path="/reports" element={<AdminReportsPage />} />
+          </Route>
+
           <Route element={<RoleRoute allowedRoles={['Admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route
@@ -68,6 +74,10 @@ export function AppRoutes() {
             />
             <Route path="/admin/create-trainer" element={<AdminCreateTrainerPage />} />
             <Route path="/admin/create-admin" element={<AdminCreateAdminPage />} />
+            <Route
+              path="/admin/create-business-user"
+              element={<AdminCreateBusinessUserPage />}
+            />
             <Route path="/admin/students" element={<AdminStudentsPage />} />
             <Route path="/admin/enrollments" element={<AdminEnrollmentsPage />} />
             <Route path="/admin/certificates" element={<AdminCertificatesPage />} />

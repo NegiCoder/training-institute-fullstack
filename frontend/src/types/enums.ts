@@ -2,6 +2,8 @@ export const UserRole = {
   Student: 1,
   Trainer: 2,
   Admin: 3,
+  // BusinessUser sirf reports dashboard dekh sakta hai
+  BusinessUser: 4,
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]

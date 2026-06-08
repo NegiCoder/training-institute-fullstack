@@ -33,6 +33,15 @@ export const authService = {
     return response.data
   },
 
+  // Business user banata hai - sirf admin call kar sakta hai
+  async createBusinessUser(request: RegisterRequest): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>(
+      '/api/auth/admin/create-business-user',
+      request,
+    )
+    return response.data
+  },
+
   async getTrainers(): Promise<TrainerListItem[]> {
     const response = await apiClient.get<TrainerListItem[]>('/api/auth/trainers')
     return response.data

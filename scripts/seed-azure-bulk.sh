@@ -4,6 +4,7 @@
 # =============================================================================
 # What it does:
 #   - 1 admin (must already exist + be promoted to Role=3 in DB)
+#   - 1 business user (reports-only demo account)
 #   - 15 trainers (created via admin)
 #   - 150 students (registered + full profiles)
 #   - 10 categories
@@ -38,6 +39,7 @@ ADMIN_EMAIL="${ADMIN_EMAIL:-admin@training.local}"
 ADMIN_PASS="${ADMIN_PASS:-Admin@12345}"
 TRAINER_PASS="Trainer@123"
 STUDENT_PASS="Student@123"
+BUSINESS_PASS="Business@123"
 
 # ---------- helpers ---------------------------------------------------------
 
@@ -90,6 +92,13 @@ create_trainer() {
   local name="$1"; local email="$2"; local token="$3"
   post "$API/api/auth/admin/create-trainer" \
     "{\"fullName\":\"$name\",\"email\":\"$email\",\"password\":\"$TRAINER_PASS\"}" \
+    "$token" | jq -r '.userId'
+}
+
+create_business_user() {
+  local name="$1"; local email="$2"; local token="$3"
+  post "$API/api/auth/admin/create-business-user" \
+    "{\"fullName\":\"$name\",\"email\":\"$email\",\"password\":\"$BUSINESS_PASS\"}" \
     "$token" | jq -r '.userId'
 }
 
@@ -220,9 +229,16 @@ if [[ -z "$ADMIN_TOKEN" || "$ADMIN_TOKEN" == "null" ]]; then
 fi
 ok "Admin logged in"
 
-# ---------- step 2: trainers ------------------------------------------------
+# ---------- step 2: business user -------------------------------------------
 
-hdr "Step 2: Creating $NUM_TRAINERS trainers"
+hdr "Step 2: Creating business user (reports-only)"
+BUSINESS_EMAIL="business@training.local"
+BUSINESS_USER_ID=$(create_business_user "Business Analyst" "$BUSINESS_EMAIL" "$ADMIN_TOKEN")
+ok "Business user: Business Analyst ($BUSINESS_EMAIL, userId=$BUSINESS_USER_ID)"
+
+# ---------- step 3: trainers ------------------------------------------------
+
+hdr "Step 3: Creating $NUM_TRAINERS trainers"
 declare -a TRAINER_IDS=()
 declare -a TRAINER_TOKENS=()
 declare -a TRAINER_EMAILS=()
@@ -239,9 +255,9 @@ for ((i=0; i<NUM_TRAINERS; i++)); do
   ok "Trainer #$((i+1)): $FULL ($EMAIL, userId=$TID)"
 done
 
-# ---------- step 3: students + profiles -------------------------------------
+# ---------- step 4: students + profiles -------------------------------------
 
-hdr "Step 3: Creating $NUM_STUDENTS students with profiles"
+hdr "Step 4: Creating $NUM_STUDENTS students with profiles"
 declare -a STUDENT_TOKENS=()
 declare -a STUDENT_EMAILS=()
 for ((i=0; i<NUM_STUDENTS; i++)); do
@@ -264,9 +280,9 @@ for ((i=0; i<NUM_STUDENTS; i++)); do
 done
 ok "All $NUM_STUDENTS students created"
 
-# ---------- step 4: categories ----------------------------------------------
+# ---------- step 5: categories ----------------------------------------------
 
-hdr "Step 4: Creating 10 categories"
+hdr "Step 5: Creating 10 categories"
 CAT_PROG=$(create_category   "Programming"      "$ADMIN_TOKEN")
 CAT_WEB=$(create_category    "Web Development"  "$ADMIN_TOKEN")
 CAT_DATA=$(create_category   "Data Science"     "$ADMIN_TOKEN")
@@ -278,10 +294,6 @@ CAT_DB=$(create_category     "Database"         "$ADMIN_TOKEN")
 CAT_QA=$(create_category     "Software Testing" "$ADMIN_TOKEN")
 CAT_PRODUCT=$(create_category "Product & Design" "$ADMIN_TOKEN")
 ok "Categories created"
-
-# ---------- step 5: courses + pricing + modules + trainer assignments --------
-
-hdr "Step 5: Creating courses (pricing + modules + trainers)"
 
 # status: 1=Draft, 2=Published, 3=Archived
 # contentType: 1=Video, 2=Pdf, 3=Link
@@ -383,6 +395,10 @@ declare -a COURSE_IDS=()
 declare -a COURSE_MODULE_LISTS=()
 declare -a COURSE_TRAINER_TOKENS=()
 
+# ---------- step 6: courses + pricing + modules + trainer assignments --------
+
+hdr "Step 6: Creating ${#COURSES[@]} courses (pricing + modules + trainers)"
+
 CIDX=0
 for row in "${COURSES[@]}"; do
   IFS='|' read -r CAT TITLE DESC LEVEL MODE DURATION STATUS FEAT <<< "$row"
@@ -443,9 +459,9 @@ for row in "${COURSES[@]}"; do
 done
 ok "All ${#COURSES[@]} courses ready"
 
-# ---------- step 6: enrollments ---------------------------------------------
+# ---------- step 7: enrollments ---------------------------------------------
 
-hdr "Step 6: Creating enrollments with hero courses, star learners and idle learners"
+hdr "Step 7: Creating enrollments with hero courses, star learners and idle learners"
 
 YEAR_AGO=$(date -u -v -30d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
 TODAY=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -515,9 +531,9 @@ for ((s=0; s<NUM_STUDENTS; s++)); do
 done
 ok "Total enrollments created: ${#ALL_ENROLLMENT_IDS[@]}"
 
-# ---------- step 7: progress + status -------------------------------------
+# ---------- step 8: progress + status -------------------------------------
 
-hdr "Step 7: Random module progress + status lifecycle"
+hdr "Step 8: Random module progress + status lifecycle"
 
 NUM_ENROLLMENTS=${#ALL_ENROLLMENT_IDS[@]}
 COMPLETED_ENROLLMENT_IDS=()
@@ -580,9 +596,9 @@ for ((e=0; e<NUM_ENROLLMENTS; e++)); do
 done
 ok "Progress + lifecycle done. Completed: ${#COMPLETED_ENROLLMENT_IDS[@]}"
 
-# ---------- step 8: certificates -------------------------------------------
+# ---------- step 9: certificates -------------------------------------------
 
-hdr "Step 8: Issuing certificates for first $TARGET_CERTIFICATES completed enrollments"
+hdr "Step 9: Issuing certificates for first $TARGET_CERTIFICATES completed enrollments"
 COUNT=0
 for EID in "${COMPLETED_ENROLLMENT_IDS[@]}"; do
   [[ $COUNT -ge $TARGET_CERTIFICATES ]] && break
@@ -601,6 +617,9 @@ hdr "Seed complete"
 echo
 color "1;32" "Login credentials:"; echo
 echo "  Admin    : $ADMIN_EMAIL  /  $ADMIN_PASS"
+echo
+echo "  Business : $BUSINESS_EMAIL  /  $BUSINESS_PASS"
+echo "             (reports-only dashboard)"
 echo
 echo "  Trainers : (password = $TRAINER_PASS)"
 for e in "${TRAINER_EMAILS[@]}"; do echo "             $e"; done

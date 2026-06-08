@@ -77,6 +77,26 @@ public class AuthController : ControllerBase
         }
     }
 
+// Business user banata hai - ye sirf reports dashboard access karega
+[HttpPost("admin/create-business-user")]
+[Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateBusinessUser([FromBody] RegisterRequest request)
+    {
+        try
+        {
+            request.Role = UserRole.BusinessUser;
+            var response = await _authService.RegisterAsync(request);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
 
 
 [HttpGet("trainers")]

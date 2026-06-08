@@ -49,6 +49,9 @@ export function PublicLayout() {
                   <NavLink to="/trainer/students">My Students</NavLink>
                 </>
               )}
+
+              {/* BusinessUser ko sirf reports dikhte hai, baaki kuch nahi */}
+              {user.role === 'BusinessUser' && <NavLink to="/reports">Reports</NavLink>}
             </>
           ) : (
             <>
@@ -155,6 +158,9 @@ function AdminManageMenu() {
           </NavLink>
           <NavLink to="/admin/create-admin" onClick={closeMenu}>
             Create Admin
+          </NavLink>
+          <NavLink to="/admin/create-business-user" onClick={closeMenu}>
+            Create Business User
           </NavLink>
         </div>
       )}

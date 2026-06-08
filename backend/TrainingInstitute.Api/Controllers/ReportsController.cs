@@ -7,7 +7,9 @@ namespace TrainingInstitute.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+// Reports ko Admin ke saath BusinessUser bhi dekh sakta hai.
+// Baaki saare controllers Admin-only hai, isliye BusinessUser sirf yahi tak limited hai.
+[Authorize(Roles = "Admin,BusinessUser")]
 public class ReportsController : ControllerBase
 {
     private readonly IReportService _reportService;

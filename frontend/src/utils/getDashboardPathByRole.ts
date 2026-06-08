@@ -1,3 +1,4 @@
+// Role ke hisab se login ke baad konsa dashboard kholna hai
 export function getDashboardPathByRole(role: string): string {
   if (role === 'Admin') {
     return '/admin'
@@ -9,6 +10,11 @@ export function getDashboardPathByRole(role: string): string {
 
   if (role === 'Student') {
     return '/student'
+  }
+
+  // BusinessUser sidha reports dashboard par jaata hai
+  if (role === 'BusinessUser') {
+    return '/reports'
   }
 
   return '/'
