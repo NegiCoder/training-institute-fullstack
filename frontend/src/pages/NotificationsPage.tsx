@@ -124,7 +124,9 @@ export function NotificationsPage() {
           {items.map((item) => (
             <li
               key={item.notificationId}
-              className={item.isRead ? 'notification-row' : 'notification-row is-unread'}
+              className={
+                item.isRead ? 'notification-row' : 'notification-row is-unread'
+              }
             >
               <div className="notification-row-body">
                 <div className="notification-row-title">
@@ -132,7 +134,9 @@ export function NotificationsPage() {
                   {!item.isRead && <span className="chip status-published">New</span>}
                 </div>
                 <p>{item.message}</p>
-                <span className="muted small-text">{formatDateTime(item.createdAt)}</span>
+                <span className="muted small-text">
+                  {formatDateTime(item.createdAt)}
+                </span>
               </div>
 
               <div className="notification-row-actions">

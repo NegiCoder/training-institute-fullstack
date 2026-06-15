@@ -69,8 +69,8 @@ export function CertificateVerifyPage() {
       <p className="eyebrow">Certificate Verification</p>
       <h1>Verify an ExcelGens Certificate</h1>
       <p className="page-text">
-        Enter the certificate number printed on the PDF (or scan the QR code) to
-        confirm that this certificate was issued by ExcelGens.
+        Enter the certificate number printed on the PDF (or scan the QR code) to confirm
+        that this certificate was issued by ExcelGens.
       </p>
 
       <form className="verify-form" onSubmit={handleSubmit}>
@@ -129,8 +129,8 @@ export function CertificateVerifyPage() {
           <span className="verify-badge verify-badge-invalid">NOT FOUND</span>
           <p className="verify-message">
             We could not find a certificate with the number{' '}
-            <strong>{result.certificateNumber || input}</strong>. Please double
-            check the number for typos and try again.
+            <strong>{result.certificateNumber || input}</strong>. Please double check
+            the number for typos and try again.
           </p>
         </div>
       )}

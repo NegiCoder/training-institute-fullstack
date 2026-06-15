@@ -62,9 +62,7 @@ export function HomePage() {
   // Email + password ek saath clipboard me copy karta hai
   async function handleCopy(account: DemoAccount) {
     try {
-      await navigator.clipboard.writeText(
-        `${account.email} / ${account.password}`,
-      )
+      await navigator.clipboard.writeText(`${account.email} / ${account.password}`)
       setCopiedRole(account.role)
       window.setTimeout(() => setCopiedRole(null), 1500)
     } catch {
@@ -114,8 +112,8 @@ export function HomePage() {
           <p className="eyebrow hero-eyebrow">Welcome to ExcelGens</p>
           <h1>Learn. Track. Certify.</h1>
           <p className="hero-text">
-            Discover practical, job-ready courses, track your progress module by
-            module, and earn verified certificates you can share with anyone.
+            Discover practical, job-ready courses, track your progress module by module,
+            and earn verified certificates you can share with anyone.
           </p>
           <div className="hero-actions">
             <Link className="hero-btn hero-btn-primary" to="/courses">
@@ -134,8 +132,8 @@ export function HomePage() {
           <p className="eyebrow">Live demo — try it yourself</p>
           <h2>Recruiter access</h2>
           <p className="demo-subtext">
-            This is a live demo with sample data. Pick any role below, copy the
-            login, and explore every feature.
+            This is a live demo with sample data. Pick any role below, copy the login,
+            and explore every feature.
           </p>
         </div>
 

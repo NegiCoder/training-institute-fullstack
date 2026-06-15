@@ -90,10 +90,7 @@ export const reportService = {
     return response.data as Blob
   },
 
-  async downloadTopCoursesCsv(
-    metric: TopCourseMetric,
-    limit = 10,
-  ): Promise<Blob> {
+  async downloadTopCoursesCsv(metric: TopCourseMetric, limit = 10): Promise<Blob> {
     const response = await apiClient.get('/api/reports/top-courses.csv', {
       params: { metric, limit },
       responseType: 'blob',
@@ -123,10 +120,7 @@ export const reportService = {
     return response.data as Blob
   },
 
-  async downloadStudentEngagementCsv(
-    idleDays = 60,
-    limit = 10,
-  ): Promise<Blob> {
+  async downloadStudentEngagementCsv(idleDays = 60, limit = 10): Promise<Blob> {
     const response = await apiClient.get('/api/reports/student-engagement.csv', {
       params: { idleDays, limit },
       responseType: 'blob',
