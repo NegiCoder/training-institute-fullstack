@@ -1651,6 +1651,113 @@
   text-decoration: underline;
 }
 
+/* ---------- Demo / recruiter access section ---------- */
+.demo-section {
+  margin: 28px 0 8px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.demo-heading {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.demo-heading h2 {
+  margin: 4px 0 6px;
+  font-size: 1.8rem;
+  color: var(--ink);
+}
+
+.demo-subtext {
+  margin: 0 auto;
+  max-width: 560px;
+  color: var(--muted);
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.demo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-alt);
+}
+
+.demo-role {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--brand-gradient);
+}
+
+.demo-blurb {
+  margin: 2px 0 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.demo-cred {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.demo-cred-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.demo-cred code {
+  font-size: 0.85rem;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.demo-copy-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--brand);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--brand-dark);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.demo-copy-btn:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 @media (max-width: 720px) {
   .hero {
     padding: 44px 26px;
@@ -1659,4 +1766,9 @@
   .value-strip {
     grid-template-columns: 1fr;
   }
+
+  .demo-grid {
+    grid-template-columns: 1fr;
+  }
 }
+

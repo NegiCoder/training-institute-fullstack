@@ -238,7 +238,10 @@ export function AdminReportsPage() {
       : 0
 
     const rows = coursePerformance.filter((course) => {
-      if (searchTerm && !course.courseTitle.toLowerCase().includes(searchTerm)) {
+      if (
+        searchTerm &&
+        !course.courseTitle.toLowerCase().includes(searchTerm)
+      ) {
         return false
       }
 
@@ -312,8 +315,8 @@ export function AdminReportsPage() {
       <p className="eyebrow">Admin</p>
       <h1>Reports</h1>
       <p className="page-text">
-        Track enrollments, course completion, certificates, and engagement. Use the tabs
-        below to switch between sections.
+        Track enrollments, course completion, certificates, and engagement. Use the
+        tabs below to switch between sections.
       </p>
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
@@ -384,7 +387,8 @@ export function AdminReportsPage() {
                 <div>
                   <h2>Course Performance</h2>
                   <p>
-                    Enrollments, progress, completion, and certificate totals by course.
+                    Enrollments, progress, completion, and certificate totals by
+                    course.
                   </p>
                 </div>
                 <button
@@ -819,8 +823,8 @@ export function AdminReportsPage() {
                 <div>
                   <h2>Student Engagement</h2>
                   <p>
-                    Top students by certificates earned and students with no enrollment
-                    in the last 60 days.
+                    Top students by certificates earned and students with no
+                    enrollment in the last 60 days.
                   </p>
                 </div>
                 <button

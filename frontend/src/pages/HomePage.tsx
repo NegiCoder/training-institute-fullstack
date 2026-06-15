@@ -3,6 +3,42 @@ import { Link } from 'react-router-dom'
 import { courseService } from '@/services/courseService'
 import { CourseStatus, type CourseResponse } from '@/types'
 
+// Recruiter/visitor ke liye ready-made demo logins.
+// Har role ka ek account - taaki saari functionality try kar sake.
+type DemoAccount = {
+  role: string
+  blurb: string
+  email: string
+  password: string
+}
+
+const DEMO_ACCOUNTS: DemoAccount[] = [
+  {
+    role: 'Admin',
+    blurb: 'Full access — manage courses, users, certificates & reports',
+    email: 'admin@training.local',
+    password: 'Admin@12345',
+  },
+  {
+    role: 'Trainer',
+    blurb: 'View assigned courses, modules & enrolled students',
+    email: 'trainer.aman.sharma@training.local',
+    password: 'Trainer@123',
+  },
+  {
+    role: 'Student',
+    blurb: 'Enroll, track progress & earn verified certificates',
+    email: 'student001@training.local',
+    password: 'Student@123',
+  },
+  {
+    role: 'Business User',
+    blurb: 'Read-only access to the reports dashboard',
+    email: 'business@training.local',
+    password: 'Business@123',
+  },
+]
+
 // Course ka price label banata hai - Free / ₹amount / Paid
 function getPriceLabel(course: CourseResponse): string {
   if (course.isFree) {
@@ -19,6 +55,22 @@ function getPriceLabel(course: CourseResponse): string {
 export function HomePage() {
   // Home page ke featured course cards yaha store hote hai
   const [featured, setFeatured] = useState<CourseResponse[]>([])
+
+  // Kaunsa demo account abhi-abhi copy hua - "Copied!" feedback dikhane ke liye
+  const [copiedRole, setCopiedRole] = useState<string | null>(null)
+
+  // Email + password ek saath clipboard me copy karta hai
+  async function handleCopy(account: DemoAccount) {
+    try {
+      await navigator.clipboard.writeText(
+        `${account.email} / ${account.password}`,
+      )
+      setCopiedRole(account.role)
+      window.setTimeout(() => setCopiedRole(null), 1500)
+    } catch {
+      // Clipboard block ho to chup-chaap ignore - user manually type kar sakta hai
+    }
+  }
 
   useEffect(() => {
     // Page khulte hi featured courses load karte hai.
@@ -62,8 +114,8 @@ export function HomePage() {
           <p className="eyebrow hero-eyebrow">Welcome to ExcelGens</p>
           <h1>Learn. Track. Certify.</h1>
           <p className="hero-text">
-            Discover practical, job-ready courses, track your progress module by module,
-            and earn verified certificates you can share with anyone.
+            Discover practical, job-ready courses, track your progress module by
+            module, and earn verified certificates you can share with anyone.
           </p>
           <div className="hero-actions">
             <Link className="hero-btn hero-btn-primary" to="/courses">
@@ -73,6 +125,51 @@ export function HomePage() {
               Join Free
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Demo access - recruiter yaha se kisi bhi role me login kar sakta hai */}
+      <section className="demo-section">
+        <div className="demo-heading">
+          <p className="eyebrow">Live demo — try it yourself</p>
+          <h2>Recruiter access</h2>
+          <p className="demo-subtext">
+            This is a live demo with sample data. Pick any role below, copy the
+            login, and explore every feature.
+          </p>
+        </div>
+
+        <div className="demo-grid">
+          {DEMO_ACCOUNTS.map((account) => (
+            <article className="demo-card" key={account.role}>
+              <span className="demo-role">{account.role}</span>
+              <p className="demo-blurb">{account.blurb}</p>
+              <div className="demo-cred">
+                <span className="demo-cred-label">Email</span>
+                <code>{account.email}</code>
+              </div>
+              <div className="demo-cred">
+                <span className="demo-cred-label">Password</span>
+                <code>{account.password}</code>
+              </div>
+              <button
+                type="button"
+                className="demo-copy-btn"
+                onClick={() => void handleCopy(account)}
+              >
+                {copiedRole === account.role ? 'Copied!' : 'Copy login'}
+              </button>
+            </article>
+          ))}
+        </div>
+
+        <div className="demo-actions">
+          <Link className="hero-btn hero-btn-primary" to="/login">
+            Go to Login
+          </Link>
+          <Link className="hero-btn hero-btn-ghost" to="/verify">
+            Verify a Certificate
+          </Link>
         </div>
       </section>
 
