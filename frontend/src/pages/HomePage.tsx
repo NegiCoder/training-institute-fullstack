@@ -7,6 +7,7 @@ import { CourseStatus, type CourseResponse } from '@/types'
 // Har role ka ek account - taaki saari functionality try kar sake.
 type DemoAccount = {
   role: string
+  icon: string
   blurb: string
   email: string
   password: string
@@ -15,24 +16,28 @@ type DemoAccount = {
 const DEMO_ACCOUNTS: DemoAccount[] = [
   {
     role: 'Admin',
+    icon: '🛡️',
     blurb: 'Full access — manage courses, users, certificates & reports',
     email: 'admin@training.local',
     password: 'Admin@12345',
   },
   {
     role: 'Trainer',
+    icon: '🧑‍🏫',
     blurb: 'View assigned courses, modules & enrolled students',
     email: 'trainer.aman.sharma@training.local',
     password: 'Trainer@123',
   },
   {
     role: 'Student',
+    icon: '🎓',
     blurb: 'Enroll, track progress & earn verified certificates',
     email: 'student001@training.local',
     password: 'Student@123',
   },
   {
     role: 'Business User',
+    icon: '📊',
     blurb: 'Read-only access to the reports dashboard',
     email: 'business@training.local',
     password: 'Business@123',
@@ -56,15 +61,15 @@ export function HomePage() {
   // Home page ke featured course cards yaha store hote hai
   const [featured, setFeatured] = useState<CourseResponse[]>([])
 
-  // Kaunsa demo account abhi-abhi copy hua - "Copied!" feedback dikhane ke liye
-  const [copiedRole, setCopiedRole] = useState<string | null>(null)
+  // Kaunsa field abhi-abhi copy hua (e.g. "Admin-email") - tick dikhane ke liye
+  const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
-  // Email + password ek saath clipboard me copy karta hai
-  async function handleCopy(account: DemoAccount) {
+  // Ek single value (sirf email ya sirf password) clipboard me copy karta hai
+  async function handleCopy(key: string, value: string) {
     try {
-      await navigator.clipboard.writeText(`${account.email} / ${account.password}`)
-      setCopiedRole(account.role)
-      window.setTimeout(() => setCopiedRole(null), 1500)
+      await navigator.clipboard.writeText(value)
+      setCopiedKey(key)
+      window.setTimeout(() => setCopiedKey(null), 1500)
     } catch {
       // Clipboard block ho to chup-chaap ignore - user manually type kar sakta hai
     }
@@ -140,32 +145,56 @@ export function HomePage() {
         <div className="demo-grid">
           {DEMO_ACCOUNTS.map((account) => (
             <article className="demo-card" key={account.role}>
-              <span className="demo-role">{account.role}</span>
+              <div className="demo-card-top">
+                <span className="demo-icon" aria-hidden="true">
+                  {account.icon}
+                </span>
+                <span className="demo-role">{account.role}</span>
+              </div>
               <p className="demo-blurb">{account.blurb}</p>
+
               <div className="demo-cred">
                 <span className="demo-cred-label">Email</span>
-                <code>{account.email}</code>
+                <div className="demo-cred-row">
+                  <code>{account.email}</code>
+                  <button
+                    type="button"
+                    className="demo-copy-icon"
+                    aria-label={`Copy ${account.role} email`}
+                    onClick={() =>
+                      void handleCopy(`${account.role}-email`, account.email)
+                    }
+                  >
+                    {copiedKey === `${account.role}-email` ? '✓' : 'Copy'}
+                  </button>
+                </div>
               </div>
+
               <div className="demo-cred">
                 <span className="demo-cred-label">Password</span>
-                <code>{account.password}</code>
+                <div className="demo-cred-row">
+                  <code>{account.password}</code>
+                  <button
+                    type="button"
+                    className="demo-copy-icon"
+                    aria-label={`Copy ${account.role} password`}
+                    onClick={() =>
+                      void handleCopy(`${account.role}-password`, account.password)
+                    }
+                  >
+                    {copiedKey === `${account.role}-password` ? '✓' : 'Copy'}
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                className="demo-copy-btn"
-                onClick={() => void handleCopy(account)}
-              >
-                {copiedRole === account.role ? 'Copied!' : 'Copy login'}
-              </button>
             </article>
           ))}
         </div>
 
         <div className="demo-actions">
-          <Link className="hero-btn hero-btn-primary" to="/login">
-            Go to Login
+          <Link className="demo-btn demo-btn-primary" to="/login">
+            Go to Login →
           </Link>
-          <Link className="hero-btn hero-btn-ghost" to="/verify">
+          <Link className="demo-btn demo-btn-ghost" to="/verify">
             Verify a Certificate
           </Link>
         </div>
