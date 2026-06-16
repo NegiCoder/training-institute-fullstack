@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { EXCELGENS_DOCS_URL } from '@/config/docs'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { useAuthStore } from '@/store/authStore'
 
@@ -21,6 +22,16 @@ export function PublicLayout() {
           <NavLink to="/courses">Courses</NavLink>
           {/* Public verify link - har user role ke liye visible (login optional) */}
           <NavLink to="/verify">Verify</NavLink>
+          {isAuthenticated && (
+            <a
+              className="site-nav-doc"
+              href={EXCELGENS_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Documentation
+            </a>
+          )}
 
           {isAuthenticated && user ? (
             <>
@@ -57,6 +68,14 @@ export function PublicLayout() {
             <>
               <NavLink to="/login">Login</NavLink>
               <NavLink to="/register">Register</NavLink>
+              <a
+                className="site-nav-doc"
+                href={EXCELGENS_DOCS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Documentation
+              </a>
             </>
           )}
         </nav>
