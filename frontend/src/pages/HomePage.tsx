@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import { courseService } from '@/services/courseService'
 import { CourseStatus, type CourseResponse } from '@/types'
 
-// Recruiter/visitor ke liye ready-made demo logins.
-// Har role ka ek account - taaki saari functionality try kar sake.
+// Ready-made demo logins — har role ka ek account taaki saari functionality try kar sake.
 type DemoAccount = {
   role: string
   icon: string
@@ -131,11 +130,10 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Demo access - recruiter yaha se kisi bhi role me login kar sakta hai */}
+      {/* Demo access — kisi bhi role me login kar ke explore karo */}
       <section className="demo-section">
         <div className="demo-heading">
           <p className="eyebrow">Live demo — try it yourself</p>
-          <h2>Recruiter access</h2>
           <p className="demo-subtext">
             This is a live demo with sample data. Pick any role below, copy the login,
             and explore every feature.
@@ -193,9 +191,6 @@ export function HomePage() {
         <div className="demo-actions">
           <Link className="demo-btn demo-btn-primary" to="/login">
             Go to Login →
-          </Link>
-          <Link className="demo-btn demo-btn-ghost" to="/verify">
-            Verify a Certificate
           </Link>
         </div>
       </section>
