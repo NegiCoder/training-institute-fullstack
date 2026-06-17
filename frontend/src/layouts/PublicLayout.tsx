@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { EXCELGENS_DOCS_URL } from '@/config/docs'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { useAuthStore } from '@/store/authStore'
@@ -8,20 +8,63 @@ export function PublicLayout() {
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const logout = useAuthStore((state) => state.logout)
+  const location = useLocation()
+  const [navOpen, setNavOpen] = useState(false)
+
+  useEffect(() => {
+    setNavOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 960) {
+        setNavOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  function closeNav() {
+    setNavOpen(false)
+  }
 
   return (
     <div className="public-layout">
       <header className="site-header">
-        <Link className="brand" to="/">
-          <img src="/excelgens-logo.jpeg" alt="" className="brand-logo" />
-          <span>ExcelGens</span>
-        </Link>
+        <div className="site-header-bar">
+          <Link className="brand" to="/" onClick={closeNav}>
+            <img src="/excelgens-logo.jpeg" alt="" className="brand-logo" />
+            <span>ExcelGens</span>
+          </Link>
 
-        <nav className="site-nav-primary" aria-label="Main navigation">
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/courses">Courses</NavLink>
+          <button
+            type="button"
+            className="site-nav-toggle"
+            aria-expanded={navOpen}
+            aria-controls="site-nav-panel"
+            onClick={() => setNavOpen((current) => !current)}
+          >
+            {navOpen ? 'Close' : 'Menu'}
+          </button>
+        </div>
+
+        <div
+          id="site-nav-panel"
+          className={`site-nav-panel${navOpen ? ' is-open' : ''}`}
+        >
+          <nav className="site-nav-primary" aria-label="Main navigation">
+          <NavLink to="/" onClick={closeNav}>
+            Home
+          </NavLink>
+          <NavLink to="/courses" onClick={closeNav}>
+            Courses
+          </NavLink>
           {/* Public verify link - har user role ke liye visible (login optional) */}
-          <NavLink to="/verify">Verify</NavLink>
+          <NavLink to="/verify" onClick={closeNav}>
+            Verify
+          </NavLink>
           {isAuthenticated && (
             <a
               className="site-nav-doc"
@@ -37,37 +80,65 @@ export function PublicLayout() {
             <>
               {user.role === 'Admin' && (
                 <>
-                  <NavLink to="/admin">Dashboard</NavLink>
-                  <NavLink to="/admin/reports">Reports</NavLink>
-                  <AdminManageMenu />
+                  <NavLink to="/admin" onClick={closeNav}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/admin/reports" onClick={closeNav}>
+                    Reports
+                  </NavLink>
+                  <AdminManageMenu onNavigate={closeNav} />
                 </>
               )}
 
               {user.role === 'Student' && (
                 <>
-                  <NavLink to="/student">Dashboard</NavLink>
-                  <NavLink to="/student/profile">Profile</NavLink>
-                  <NavLink to="/student/enrollments">My Courses</NavLink>
-                  <NavLink to="/student/certificates">Certificates</NavLink>
+                  <NavLink to="/student" onClick={closeNav}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/student/profile" onClick={closeNav}>
+                    Profile
+                  </NavLink>
+                  <NavLink to="/student/enrollments" onClick={closeNav}>
+                    My Courses
+                  </NavLink>
+                  <NavLink to="/student/certificates" onClick={closeNav}>
+                    Certificates
+                  </NavLink>
                 </>
               )}
 
               {user.role === 'Trainer' && (
                 <>
-                  <NavLink to="/trainer">Dashboard</NavLink>
-                  <NavLink to="/trainer/courses">My Courses</NavLink>
-                  <NavLink to="/trainer/modules">Manage Content</NavLink>
-                  <NavLink to="/trainer/students">My Students</NavLink>
+                  <NavLink to="/trainer" onClick={closeNav}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/trainer/courses" onClick={closeNav}>
+                    My Courses
+                  </NavLink>
+                  <NavLink to="/trainer/modules" onClick={closeNav}>
+                    Manage Content
+                  </NavLink>
+                  <NavLink to="/trainer/students" onClick={closeNav}>
+                    My Students
+                  </NavLink>
                 </>
               )}
 
               {/* BusinessUser ko sirf reports dikhte hai, baaki kuch nahi */}
-              {user.role === 'BusinessUser' && <NavLink to="/reports">Reports</NavLink>}
+              {user.role === 'BusinessUser' && (
+                <NavLink to="/reports" onClick={closeNav}>
+                  Reports
+                </NavLink>
+              )}
             </>
           ) : (
             <>
-              <NavLink to="/login">Login</NavLink>
-              <NavLink to="/register">Register</NavLink>
+              <NavLink to="/login" onClick={closeNav}>
+                Login
+              </NavLink>
+              <NavLink to="/register" onClick={closeNav}>
+                Register
+              </NavLink>
               <a
                 className="site-nav-doc"
                 href={EXCELGENS_DOCS_URL}
@@ -78,19 +149,20 @@ export function PublicLayout() {
               </a>
             </>
           )}
-        </nav>
+          </nav>
 
-        {isAuthenticated && user && (
-          <div className="site-nav-actions">
-            <NotificationBell />
-            <span className="user-pill" title={`${user.fullName} (${user.role})`}>
-              {user.fullName} ({user.role})
-            </span>
-            <button className="nav-button" type="button" onClick={logout}>
-              Logout
-            </button>
-          </div>
-        )}
+          {isAuthenticated && user && (
+            <div className="site-nav-actions">
+              <NotificationBell />
+              <span className="user-pill" title={`${user.fullName} (${user.role})`}>
+                {user.fullName} ({user.role})
+              </span>
+              <button className="nav-button" type="button" onClick={logout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="layout-content">
@@ -100,7 +172,7 @@ export function PublicLayout() {
   )
 }
 
-function AdminManageMenu() {
+function AdminManageMenu({ onNavigate }: { onNavigate?: () => void }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -134,6 +206,7 @@ function AdminManageMenu() {
 
   function closeMenu() {
     setOpen(false)
+    onNavigate?.()
   }
 
   return (

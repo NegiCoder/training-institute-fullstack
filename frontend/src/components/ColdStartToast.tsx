@@ -36,8 +36,8 @@ export function ColdStartToast() {
       aria-live="polite"
     >
       <span>
-        <b>Server waking up.</b> After idle, the backend may take a few seconds to
-        restart. Please wait — refresh once if the page seems stuck.
+        <b>Server waking up.</b> After idle, the backend may take a few seconds to restart. Please
+        wait — refresh once if the page seems stuck.
       </span>
       <button type="button" onClick={dismiss} title="Dismiss" aria-label="Dismiss">
         ×
