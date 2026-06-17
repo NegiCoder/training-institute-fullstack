@@ -163,6 +163,67 @@
   color: #78350f;
 }
 
+.desktop-hint-toast {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 1999;
+  width: min(440px, calc(100vw - 24px));
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #3b82f6;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.14);
+  transform: translate(-50%, -12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.desktop-hint-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.desktop-hint-toast .desktop-hint-icon {
+  flex: none;
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.desktop-hint-toast span:not(.desktop-hint-icon) {
+  flex: 1;
+  text-align: left;
+}
+
+.desktop-hint-toast b {
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.desktop-hint-toast button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #1d4ed8;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.desktop-hint-toast button:hover {
+  color: #1e3a8a;
+}
+
 .user-pill {
   display: inline-block;
   max-width: 240px;
