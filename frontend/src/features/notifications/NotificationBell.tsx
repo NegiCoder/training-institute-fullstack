@@ -200,7 +200,7 @@ export function NotificationBell() {
     <div className="notification-bell" ref={containerRef}>
       <button
         type="button"
-        className={`notification-bell-trigger ${isOpen ? 'is-open' : ''}`}
+        className={`notification-bell-trigger ${isOpen ? 'is-open' : ''}${unreadCount > 0 ? ' has-unread' : ''}`}
         onClick={togglePanel}
         aria-haspopup="true"
         aria-expanded={isOpen}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { CourseCard } from '@/components/ui/CourseCard'
+import { CourseGridSkeleton } from '@/components/ui/DashboardSkeleton'
 import { courseCategoryService } from '@/services/courseCategoryService'
 import { courseService } from '@/services/courseService'
 import {
@@ -13,20 +15,10 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced']
 const MODE_OPTIONS = ['Online', 'Hybrid']
 
-function getPriceLabel(course: CourseResponse): string {
-  if (course.isFree) {
-    return 'Free'
-  }
-
-  if (course.currentPrice != null) {
-    return `₹${course.currentPrice}`
-  }
-
-  return 'Paid'
-}
-
 export function CourseCatalogPage() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchParams] = useSearchParams()
+  const initialSearch = searchParams.get('search') ?? ''
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
   const [categoryId, setCategoryId] = useState('')
   const [level, setLevel] = useState('')
   const [mode, setMode] = useState('')
@@ -37,6 +29,12 @@ export function CourseCatalogPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isCategoryLoading, setIsCategoryLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    const q = searchParams.get('search') ?? ''
+    setSearchTerm(q)
+    setPageNumber(1)
+  }, [searchParams])
 
   // Filter dropdown ke liye categories ek baar load karte hai
   useEffect(() => {
@@ -178,7 +176,7 @@ export function CourseCatalogPage() {
         </button>
       </div>
 
-      {isLoading && <p className="page-text">Loading courses...</p>}
+      {isLoading && <CourseGridSkeleton count={6} />}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
@@ -190,22 +188,7 @@ export function CourseCatalogPage() {
         <>
           <div className="course-grid">
             {courses.items.map((course) => (
-              <article className="course-card" key={course.courseId}>
-                <div className="course-card-header">
-                  <span>{course.categoryName}</span>
-                  <strong>{getPriceLabel(course)}</strong>
-                </div>
-                <h2>{course.title}</h2>
-                <p>{course.description ?? 'No description available.'}</p>
-                <div className="course-meta">
-                  <span>{course.level}</span>
-                  <span>{course.mode}</span>
-                  <span>{course.duration}</span>
-                </div>
-                <Link className="course-link" to={`/courses/${course.courseId}`}>
-                  View details
-                </Link>
-              </article>
+              <CourseCard key={course.courseId} course={course} />
             ))}
           </div>
 

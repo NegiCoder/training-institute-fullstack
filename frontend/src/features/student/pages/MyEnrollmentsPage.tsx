@@ -1,29 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { EnrollmentCard } from '@/components/ui/EnrollmentCard'
+import { DashboardSkeleton } from '@/components/ui/DashboardSkeleton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { enrollmentService } from '@/services/enrollmentService'
 import type { EnrollmentResponse } from '@/types'
-import { EnrollmentStatus } from '@/types'
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
-
-function getEnrollmentStatusLabel(status: number): string {
-  if (status === EnrollmentStatus.Assigned) {
-    return 'Assigned'
-  }
-
-  if (status === EnrollmentStatus.InProgress) {
-    return 'In Progress'
-  }
-
-  if (status === EnrollmentStatus.Completed) {
-    return 'Completed'
-  }
-
-  if (status === EnrollmentStatus.Cancelled) {
-    return 'Cancelled'
-  }
-
-  return 'Unknown'
-}
 
 export function MyEnrollmentsPage() {
   const [enrollments, setEnrollments] = useState<EnrollmentResponse[]>([])
@@ -48,14 +29,15 @@ export function MyEnrollmentsPage() {
   }, [])
 
   return (
-    <section className="page-card">
-      <p className="eyebrow">Student</p>
-      <h1>My Enrollments</h1>
-      <p className="page-text">
-        Track your enrolled courses, current status, and progress percentage.
-      </p>
+    <div className="dashboard-page">
+      <PageHeader
+        eyebrow="My Learning"
+        title="My Courses"
+        description="Track your enrolled courses, current status, and progress percentage."
+        breadcrumbs={[{ label: 'Dashboard', to: '/student' }, { label: 'My Courses' }]}
+      />
 
-      {isLoading && <p className="page-text">Loading enrollments...</p>}
+      {isLoading && <DashboardSkeleton statCount={0} cardCount={4} />}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
@@ -64,37 +46,15 @@ export function MyEnrollmentsPage() {
       )}
 
       {!isLoading && !errorMessage && enrollments.length > 0 && (
-        <div className="enrollment-grid">
+        <div className="course-grid">
           {enrollments.map((enrollment) => (
-            <article className="enrollment-card" key={enrollment.courseEnrollmentId}>
-              <div className="course-card-header">
-                <span>{getEnrollmentStatusLabel(enrollment.status)}</span>
-                <strong>{enrollment.progressPercentage}%</strong>
-              </div>
-
-              <h2>{enrollment.courseTitle}</h2>
-              <p>
-                {new Date(enrollment.startDate).toLocaleDateString()} -{' '}
-                {new Date(enrollment.endDate).toLocaleDateString()}
-              </p>
-
-              <div className="progress-track">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${enrollment.progressPercentage}%` }}
-                />
-              </div>
-
-              <Link
-                className="course-link"
-                to={`/student/enrollments/${enrollment.courseEnrollmentId}`}
-              >
-                View progress
-              </Link>
-            </article>
+            <EnrollmentCard
+              key={enrollment.courseEnrollmentId}
+              enrollment={enrollment}
+            />
           ))}
         </div>
       )}
-    </section>
+    </div>
   )
 }

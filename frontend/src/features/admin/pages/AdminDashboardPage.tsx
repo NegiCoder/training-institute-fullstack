@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { StatCard } from '@/components/ui/StatCard'
+import { DashboardSkeleton } from '@/components/ui/DashboardSkeleton'
 import { certificateService } from '@/services/certificateService'
 import { courseService } from '@/services/courseService'
 import { enrollmentService } from '@/services/enrollmentService'
@@ -53,47 +56,65 @@ export function AdminDashboardPage() {
   }, [])
 
   return (
-    <section className="page-card">
-      <p className="eyebrow">Admin</p>
-      <h1>Admin Dashboard</h1>
-      <p className="page-text">
-        Manage courses, students, enrollments, trainers, and certificates.
-      </p>
+    <div className="dashboard-page">
+      <PageHeader
+        eyebrow="Admin"
+        title="Institute Overview"
+        description="KPIs at a glance — use the sections below to manage courses, people, and analytics."
+        breadcrumbs={[{ label: 'Overview', to: '/admin' }]}
+        actions={
+          <Link className="home-btn home-btn--primary" to="/admin/reports">
+            View Reports
+          </Link>
+        }
+      />
 
-      {isLoading && <p className="page-text">Loading dashboard...</p>}
+      {isLoading && <DashboardSkeleton statCount={4} cardCount={0} />}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
       {!isLoading && !errorMessage && (
         <>
-          <div className="dashboard-grid">
-            <div className="dashboard-card">
-              <span>Total Students</span>
-              <strong>{stats.students}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Total Courses</span>
-              <strong>{stats.courses}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Total Enrollments</span>
-              <strong>{stats.enrollments}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Total Certificates</span>
-              <strong>{stats.certificates}</strong>
-            </div>
-          </div>
+          <section className="dashboard-stats" aria-label="Institute KPIs">
+            <StatCard label="Students" value={stats.students} icon="🎓" />
+            <StatCard label="Courses" value={stats.courses} icon="📚" />
+            <StatCard label="Enrollments" value={stats.enrollments} icon="📋" />
+            <StatCard label="Certificates" value={stats.certificates} icon="🏆" />
+          </section>
 
-          <div className="quick-link-grid">
-            <Link to="/admin/courses">Manage Courses</Link>
-            <Link to="/admin/students">View Students</Link>
-            <Link to="/admin/enrollments">Manage Enrollments</Link>
-            <Link to="/admin/certificates">Issue Certificates</Link>
-            <Link to="/admin/reports">View Reports</Link>
-          </div>
+          <section className="dashboard-panel">
+            <div className="dashboard-panel__head">
+              <h2>Learning</h2>
+            </div>
+            <div className="quick-link-grid">
+              <Link to="/admin/courses">Courses</Link>
+              <Link to="/admin/course-categories">Categories</Link>
+              <Link to="/admin/course-pricing">Pricing</Link>
+              <Link to="/admin/course-trainers">Trainers</Link>
+            </div>
+          </section>
+
+          <section className="dashboard-panel">
+            <div className="dashboard-panel__head">
+              <h2>People</h2>
+            </div>
+            <div className="quick-link-grid">
+              <Link to="/admin/students">Students</Link>
+              <Link to="/admin/enrollments">Enrollments</Link>
+              <Link to="/admin/certificates">Certificates</Link>
+            </div>
+          </section>
+
+          <section className="dashboard-panel">
+            <div className="dashboard-panel__head">
+              <h2>Analytics</h2>
+            </div>
+            <div className="quick-link-grid">
+              <Link to="/admin/reports">Reports Dashboard</Link>
+            </div>
+          </section>
         </>
       )}
-    </section>
+    </div>
   )
 }

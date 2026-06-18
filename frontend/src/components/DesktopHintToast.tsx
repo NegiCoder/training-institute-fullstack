@@ -5,7 +5,8 @@ const AUTO_DISMISS_MS = 6500
 
 function isNonDesktopViewport(): boolean {
   const ua = navigator.userAgent || ''
-  const mobileUa = /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini|Mobile/i.test(ua)
+  const mobileUa =
+    /Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini|Mobile/i.test(ua)
   const narrow = window.matchMedia('(max-width: 1024px)').matches
   return mobileUa || narrow
 }
@@ -53,7 +54,8 @@ export function DesktopHintToast() {
         🖥️
       </span>
       <span>
-        <b>Best on laptop or desktop.</b> For the best preview, please open this site on a computer.
+        <b>Best on laptop or desktop.</b> For the best preview, please open this site on
+        a computer.
       </span>
       <button type="button" onClick={dismiss} title="Dismiss" aria-label="Dismiss">
         ×

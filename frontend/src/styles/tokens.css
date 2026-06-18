@@ -1,0 +1,57 @@
+/* Design tokens — single source of truth for the ExcelGens UI */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Brand */
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1d4ed8;
+  --primary-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --surface-elevated: #ffffff;
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #cbd5e1;
+  --sidebar-active: #2563eb;
+
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-inverse: #ffffff;
+  --text-on-sidebar: #e2e8f0;
+
+  /* Borders & shadows */
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 16px 48px rgba(15, 23, 42, 0.1);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Layout */
+  --sidebar-width: 16.5rem;
+  --sidebar-collapsed: 4.5rem;
+  --topbar-height: 4rem;
+  --transition: 0.2s ease;
+
+  /* Status */
+  --success: #059669;
+  --error: #dc2626;
+  --warning: #d97706;
+
+  /* Legacy aliases (existing pages) */
+  --brand: var(--primary);
+  --brand-dark: var(--primary-dark);
+  --accent: #4f46e5;
+  --accent-dark: #4338ca;
+  --ink: var(--text-primary);
+  --muted: var(--text-secondary);
+  --surface-alt: var(--surface-muted);
+  --brand-gradient: var(--primary-gradient);
+}

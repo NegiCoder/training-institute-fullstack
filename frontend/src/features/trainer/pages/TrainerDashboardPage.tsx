@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { DashboardSkeleton } from '@/components/ui/DashboardSkeleton'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { StatCard } from '@/components/ui/StatCard'
 import { courseTrainerService } from '@/services/courseTrainerService'
 import { enrollmentService } from '@/services/enrollmentService'
 import { useAuthStore } from '@/store/authStore'
@@ -44,47 +47,71 @@ export function TrainerDashboardPage() {
   ).size
 
   return (
-    <section className="page-card">
-      <p className="eyebrow">Trainer</p>
-      <h1>Trainer Dashboard</h1>
-      <p className="page-text">
-        Upload and manage course content, and track the students enrolled in your
-        courses.
-      </p>
+    <div className="dashboard-page">
+      <PageHeader
+        eyebrow="Trainer"
+        title={
+          user?.fullName
+            ? `Welcome, ${user.fullName.split(' ')[0]}`
+            : 'Trainer Overview'
+        }
+        description="Upload and manage course content, and track students enrolled in your courses."
+        breadcrumbs={[{ label: 'Overview', to: '/trainer' }]}
+      />
 
-      {isLoading && <p className="page-text">Loading dashboard...</p>}
+      {isLoading && <DashboardSkeleton statCount={4} cardCount={0} />}
 
       {errorMessage && <div className="alert error-alert">{errorMessage}</div>}
 
       {!isLoading && !errorMessage && (
         <>
-          <div className="dashboard-grid">
-            <div className="dashboard-card">
-              <span>Assigned Courses</span>
-              <strong>{uniqueCourseCount}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Enrolled Students</span>
-              <strong>{enrollments.length}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Trainer</span>
-              <strong>{user?.fullName ?? '-'}</strong>
-            </div>
-            <div className="dashboard-card">
-              <span>Role</span>
-              <strong>{user?.role ?? '-'}</strong>
-            </div>
-          </div>
+          <section className="dashboard-stats" aria-label="Trainer stats">
+            <StatCard label="Assigned Courses" value={uniqueCourseCount} icon="📚" />
+            <StatCard label="Enrolled Students" value={enrollments.length} icon="🎓" />
+            <StatCard label="Trainer" value={user?.fullName ?? '-'} icon="🧑‍🏫" />
+            <StatCard label="Role" value={user?.role ?? '-'} icon="📊" />
+          </section>
 
-          <div className="quick-link-grid">
-            <Link to="/trainer/courses">My Courses</Link>
-            <Link to="/trainer/modules">Manage Content</Link>
-            <Link to="/trainer/students">My Students</Link>
-            <Link to="/courses">Course Catalog</Link>
-          </div>
+          {assignedCourses.length > 0 && (
+            <section className="dashboard-panel">
+              <div className="dashboard-panel__head">
+                <h2>Assigned Courses</h2>
+                <Link className="dashboard-panel__link" to="/trainer/courses">
+                  View all →
+                </Link>
+              </div>
+              <div className="course-grid">
+                {assignedCourses.slice(0, 6).map((course) => (
+                  <article className="lms-course-card" key={course.courseTrainerId}>
+                    <div className="lms-course-card__header">
+                      <span className="lms-course-card__category">Assigned</span>
+                    </div>
+                    <h3 className="lms-course-card__title">{course.courseTitle}</h3>
+                    <p className="lms-course-card__desc">
+                      Assigned {new Date(course.assignedAt).toLocaleDateString()}
+                    </p>
+                    <Link className="lms-course-card__btn" to="/trainer/modules">
+                      Manage Content
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="dashboard-panel">
+            <div className="dashboard-panel__head">
+              <h2>Quick Actions</h2>
+            </div>
+            <div className="quick-link-grid">
+              <Link to="/trainer/courses">My Courses</Link>
+              <Link to="/trainer/modules">Manage Content</Link>
+              <Link to="/trainer/students">My Students</Link>
+              <Link to="/courses">Course Catalog</Link>
+            </div>
+          </section>
         </>
       )}
-    </section>
+    </div>
   )
 }

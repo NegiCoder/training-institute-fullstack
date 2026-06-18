@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { DemoHintToast } from '@/components/DemoHintToast'
+import { CourseCard } from '@/components/ui/CourseCard'
+import { CourseGridSkeleton } from '@/components/ui/DashboardSkeleton'
 import { courseService } from '@/services/courseService'
 import { CourseStatus, type CourseResponse } from '@/types'
 
-// Ready-made demo logins — har role ka ek account taaki saari functionality try kar sake.
+type HomeTab = 'courses' | 'demo'
+
 type DemoAccount = {
   role: string
   icon: string
@@ -43,42 +47,35 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
   },
 ]
 
-// Course ka price label banata hai - Free / ₹amount / Paid
-function getPriceLabel(course: CourseResponse): string {
-  if (course.isFree) {
-    return 'Free'
-  }
-
-  if (course.currentPrice != null) {
-    return `₹${course.currentPrice}`
-  }
-
-  return 'Paid'
-}
-
 export function HomePage() {
-  // Home page ke featured course cards yaha store hote hai
+  const [activeTab, setActiveTab] = useState<HomeTab>('courses')
   const [featured, setFeatured] = useState<CourseResponse[]>([])
-
-  // Kaunsa field abhi-abhi copy hua (e.g. "Admin-email") - tick dikhane ke liye
+  const [isLoading, setIsLoading] = useState(true)
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+  const demoSectionRef = useRef<HTMLElement>(null)
 
-  // Ek single value (sirf email ya sirf password) clipboard me copy karta hai
+  function openDemoTab() {
+    setActiveTab('demo')
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 80)
+    })
+  }
+
   async function handleCopy(key: string, value: string) {
     try {
       await navigator.clipboard.writeText(value)
       setCopiedKey(key)
       window.setTimeout(() => setCopiedKey(null), 1500)
     } catch {
-      // Clipboard block ho to chup-chaap ignore - user manually type kar sakta hai
+      /* clipboard blocked */
     }
   }
 
   useEffect(() => {
-    // Page khulte hi featured courses load karte hai.
-    // Pehle "featured" wale try karenge, na mile to latest published dikha denge,
-    // taaki home page kabhi khali na lage.
     async function loadFeatured() {
+      setIsLoading(true)
       try {
         const featuredResult = await courseService.search({
           status: CourseStatus.Published,
@@ -92,7 +89,6 @@ export function HomePage() {
           return
         }
 
-        // Fallback: koi course featured nahi hai to latest published utha lo
         const latestResult = await courseService.search({
           status: CourseStatus.Published,
           pageNumber: 1,
@@ -100,8 +96,9 @@ export function HomePage() {
         })
         setFeatured(latestResult.items)
       } catch {
-        // Error aaye to section chhup jayega - broken box nahi dikhayenge
         setFeatured([])
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -110,142 +107,199 @@ export function HomePage() {
 
   return (
     <div className="home">
-      {/* Hero - sabse upar wala colorful welcome section */}
-      <section className="hero">
-        <div className="hero-content">
-          <p className="eyebrow hero-eyebrow">Welcome to ExcelGens</p>
-          <h1>Learn. Track. Certify.</h1>
-          <p className="hero-text">
+      <DemoHintToast onOpenDemo={openDemoTab} />
+
+      <section className="home-hero" aria-labelledby="home-hero-title">
+        <div className="home-hero__content">
+          <p className="home-hero__eyebrow">Welcome to ExcelGens</p>
+          <h1 id="home-hero-title" className="home-hero__title">
+            Learn. Track. Certify.
+          </h1>
+          <p className="home-hero__text">
             Discover practical, job-ready courses, track your progress module by module,
             and earn verified certificates you can share with anyone.
           </p>
-          <div className="hero-actions">
-            <Link className="hero-btn hero-btn-primary" to="/courses">
+          <div className="home-hero__actions">
+            <Link className="home-btn home-btn--primary" to="/courses">
               Browse Courses
             </Link>
-            <Link className="hero-btn hero-btn-ghost" to="/register">
+            <button
+              type="button"
+              className="home-btn home-btn--ghost"
+              onClick={openDemoTab}
+            >
+              Try Live Demo
+            </button>
+            <Link className="home-btn home-btn--ghost" to="/register">
               Join Free
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Demo access — kisi bhi role me login kar ke explore karo */}
-      <section className="demo-section">
-        <div className="demo-heading">
-          <p className="eyebrow">Live demo — try it yourself</p>
-          <p className="demo-subtext">
-            This is a live demo with sample data. Pick any role below, copy the login,
-            and explore every feature.
+      <section className="home-stats" aria-label="Platform highlights">
+        <article className="home-stat">
+          <span className="home-stat__icon" aria-hidden="true">
+            📚
+          </span>
+          <h2 className="home-stat__title">Learn</h2>
+          <p className="home-stat__text">
+            Hands-on courses across development, data, cloud, and more.
           </p>
+        </article>
+        <article className="home-stat">
+          <span className="home-stat__icon" aria-hidden="true">
+            📈
+          </span>
+          <h2 className="home-stat__title">Track</h2>
+          <p className="home-stat__text">
+            Follow your module progress and stay on top of every course.
+          </p>
+        </article>
+        <article className="home-stat">
+          <span className="home-stat__icon" aria-hidden="true">
+            🎓
+          </span>
+          <h2 className="home-stat__title">Certify</h2>
+          <p className="home-stat__text">
+            Earn verifiable certificates with a scannable QR code.
+          </p>
+        </article>
+      </section>
+
+      <section
+        ref={demoSectionRef}
+        className="home-tabs-panel"
+        id="live-demo-section"
+        aria-labelledby="home-tabs-heading"
+      >
+        <div className="home-tabs-panel__head">
+          <h2 id="home-tabs-heading" className="visually-hidden">
+            Explore ExcelGens
+          </h2>
+          <div className="home-tabs" role="tablist" aria-label="Home page sections">
+            <button
+              type="button"
+              role="tab"
+              id="home-tab-courses"
+              className={`home-tabs__btn${activeTab === 'courses' ? ' home-tabs__btn--active' : ''}`}
+              aria-selected={activeTab === 'courses'}
+              aria-controls="home-panel-courses"
+              onClick={() => setActiveTab('courses')}
+            >
+              Featured Courses
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="home-tab-demo"
+              className={`home-tabs__btn${activeTab === 'demo' ? ' home-tabs__btn--active' : ''}`}
+              aria-selected={activeTab === 'demo'}
+              aria-controls="home-panel-demo"
+              onClick={openDemoTab}
+            >
+              Live Demo
+            </button>
+          </div>
+          {activeTab === 'courses' && (
+            <Link className="home-section__link" to="/courses">
+              View all courses →
+            </Link>
+          )}
         </div>
 
-        <div className="demo-grid">
-          {DEMO_ACCOUNTS.map((account) => (
-            <article className="demo-card" key={account.role}>
-              <div className="demo-card-top">
-                <span className="demo-icon" aria-hidden="true">
-                  {account.icon}
-                </span>
-                <span className="demo-role">{account.role}</span>
-              </div>
-              <p className="demo-blurb">{account.blurb}</p>
+        <div
+          role="tabpanel"
+          id="home-panel-courses"
+          aria-labelledby="home-tab-courses"
+          className={`home-tabs-panel__body${activeTab === 'courses' ? '' : ' home-tabs-panel__body--hidden'}`}
+          hidden={activeTab !== 'courses'}
+        >
+          {isLoading && <CourseGridSkeleton count={6} />}
 
-              <div className="demo-cred">
-                <span className="demo-cred-label">Email</span>
-                <div className="demo-cred-row">
-                  <code>{account.email}</code>
+          {!isLoading && featured.length > 0 && (
+            <div className="course-grid">
+              {featured.map((course) => (
+                <CourseCard key={course.courseId} course={course} />
+              ))}
+            </div>
+          )}
+
+          {!isLoading && featured.length === 0 && (
+            <p className="page-text">No published courses available right now.</p>
+          )}
+        </div>
+
+        <div
+          role="tabpanel"
+          id="home-panel-demo"
+          aria-labelledby="home-tab-demo"
+          className={`home-tabs-panel__body home-demo${activeTab === 'demo' ? '' : ' home-tabs-panel__body--hidden'}`}
+          hidden={activeTab !== 'demo'}
+        >
+          <div className="home-demo__head">
+            <p className="home-hero__eyebrow" style={{ color: 'var(--primary)' }}>
+              Live demo — try it yourself
+            </p>
+            <p className="home-demo__head-text">
+              This is a live demo with sample data. Pick any role below, copy the login,
+              and explore every feature.
+            </p>
+          </div>
+
+          <div className="home-demo__grid">
+            {DEMO_ACCOUNTS.map((account) => (
+              <article className="home-demo-card" key={account.role}>
+                <div className="home-demo-card__top">
+                  <span aria-hidden="true">{account.icon}</span>
+                  <span className="home-demo-card__role">{account.role}</span>
+                </div>
+                <p className="home-demo-card__blurb">{account.blurb}</p>
+
+                <div className="home-demo-card__cred">
+                  <span className="home-demo-card__label">Email</span>
+                  <code className="home-demo-card__value" title={account.email}>
+                    {account.email}
+                  </code>
                   <button
                     type="button"
-                    className="demo-copy-icon"
+                    className="home-demo-card__copy"
                     aria-label={`Copy ${account.role} email`}
                     onClick={() =>
                       void handleCopy(`${account.role}-email`, account.email)
                     }
                   >
-                    {copiedKey === `${account.role}-email` ? '✓' : 'Copy'}
+                    {copiedKey === `${account.role}-email` ? 'Copied ✓' : 'Copy email'}
                   </button>
                 </div>
-              </div>
 
-              <div className="demo-cred">
-                <span className="demo-cred-label">Password</span>
-                <div className="demo-cred-row">
-                  <code>{account.password}</code>
+                <div className="home-demo-card__cred">
+                  <span className="home-demo-card__label">Password</span>
+                  <code className="home-demo-card__value">{account.password}</code>
                   <button
                     type="button"
-                    className="demo-copy-icon"
+                    className="home-demo-card__copy"
                     aria-label={`Copy ${account.role} password`}
                     onClick={() =>
                       void handleCopy(`${account.role}-password`, account.password)
                     }
                   >
-                    {copiedKey === `${account.role}-password` ? '✓' : 'Copy'}
+                    {copiedKey === `${account.role}-password`
+                      ? 'Copied ✓'
+                      : 'Copy password'}
                   </button>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="demo-actions">
-          <Link className="demo-btn demo-btn-primary" to="/login">
-            Go to Login →
-          </Link>
-        </div>
-      </section>
-
-      {/* Value strip - 3 chhote points, bina kisi data ke bhi page bhara dikhta hai */}
-      <section className="value-strip">
-        <div className="value-card">
-          <span className="value-icon">📚</span>
-          <h3>Learn</h3>
-          <p>Hands-on courses across development, data, cloud, and more.</p>
-        </div>
-        <div className="value-card">
-          <span className="value-icon">📈</span>
-          <h3>Track</h3>
-          <p>Follow your module progress and stay on top of every course.</p>
-        </div>
-        <div className="value-card">
-          <span className="value-icon">🎓</span>
-          <h3>Certify</h3>
-          <p>Earn verifiable certificates with a scannable QR code.</p>
-        </div>
-      </section>
-
-      {/* Featured courses - tabhi dikhega jab API se courses mile */}
-      {featured.length > 0 && (
-        <section className="featured-section">
-          <div className="section-heading">
-            <h2>Featured Courses</h2>
-            <Link className="section-link" to="/courses">
-              View all courses →
-            </Link>
-          </div>
-
-          <div className="course-grid">
-            {featured.map((course) => (
-              <article className="course-card" key={course.courseId}>
-                <div className="course-card-header">
-                  <span>{course.categoryName}</span>
-                  <strong>{getPriceLabel(course)}</strong>
-                </div>
-                <h2>{course.title}</h2>
-                <p>{course.description ?? 'No description available.'}</p>
-                <div className="course-meta">
-                  <span>{course.level}</span>
-                  <span>{course.mode}</span>
-                  <span>{course.duration}</span>
-                </div>
-                <Link className="course-link" to={`/courses/${course.courseId}`}>
-                  View details
-                </Link>
               </article>
             ))}
           </div>
-        </section>
-      )}
+
+          <div className="home-demo__actions">
+            <Link className="home-btn home-btn--primary" to="/login">
+              Go to Login →
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
