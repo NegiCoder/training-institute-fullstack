@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { EXCELGENS_DOCS_URL } from '@/config/docs'
+import { AUTHOR_LINKEDIN_URL, EXCELGENS_DOCS_URL } from '@/config/docs'
 import { useAuthStore } from '@/store/authStore'
 import { getDashboardPathByRole } from '@/utils/getDashboardPathByRole'
 
@@ -76,6 +76,14 @@ export function PublicLayout() {
               rel="noopener noreferrer"
             >
               Documentation
+            </a>
+            <a
+              className="site-nav-doc"
+              href={AUTHOR_LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
             </a>
 
             {!isAuthenticated ? (

@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { EXCELGENS_DOCS_URL } from '@/config/docs'
+import { AUTHOR_LINKEDIN_URL, EXCELGENS_DOCS_URL } from '@/config/docs'
 import {
   getDashboardHomePath,
   getDashboardNav,
@@ -163,6 +163,18 @@ export function DashboardLayout() {
               📖
             </span>
             <span className="dashboard-sidebar__text">Documentation</span>
+          </a>
+          <a
+            className="dashboard-sidebar__link"
+            href={AUTHOR_LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={sidebarCollapsed ? 'LinkedIn' : undefined}
+          >
+            <span className="dashboard-sidebar__icon" aria-hidden="true">
+              in
+            </span>
+            <span className="dashboard-sidebar__text">LinkedIn</span>
           </a>
           <button
             type="button"
