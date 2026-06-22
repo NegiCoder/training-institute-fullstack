@@ -8,5 +8,4 @@
 export const EXCELGENS_DOCS_URL =
   'https://app.notion.com/p/ExcelGens-Training-Institute-a7d330d04f66491e9b0af3de9748cdaf'
 
-export const AUTHOR_LINKEDIN_URL =
-  'https://www.linkedin.com/in/anshul-negi-55aa14345/'
+export const AUTHOR_LINKEDIN_URL = 'https://www.linkedin.com/in/anshul-negi-55aa14345/'
