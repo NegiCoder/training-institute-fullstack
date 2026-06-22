@@ -9,6 +9,7 @@
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![.NET](https://img.shields.io/badge/.NET%20API-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Azure](https://img.shields.io/badge/Backend-Azure%20Container%20Apps-0078D4?style=flat-square&logo=microsoftazure)](https://azure.microsoft.com/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Anshul_Negi-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/anshul-negi-55aa14345/)
 
 **Full-stack LMS for training institutes** — course catalog, enrollments, role-based dashboards (Admin, Trainer, Student, Business), progress tracking, PDF certificates with QR verification, email notifications, and analytics reports.
 
@@ -122,7 +123,7 @@ Bug reports and UI/UX improvements are welcome.
 
 ## Author
 
-**[Anshul Negi](https://github.com/NegiCoder)** — full-stack portfolio project.
+**[Anshul Negi](https://github.com/NegiCoder)** · [LinkedIn](https://www.linkedin.com/in/anshul-negi-55aa14345/) — full-stack portfolio project.
 
 ## License
 
