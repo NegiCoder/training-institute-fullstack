@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 Anshul Negi
+ * GitHub: https://github.com/NegiCoder
+ * Unauthorized copying, modification, or distribution of this file
+ * without explicit permission is prohibited.
+ */
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'

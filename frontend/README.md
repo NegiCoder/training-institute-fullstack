@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Anshul Negi | https://github.com/NegiCoder -->
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

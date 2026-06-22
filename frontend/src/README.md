@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Anshul Negi | https://github.com/NegiCoder -->
+
 # Source Folder Guide
 
 This folder uses an industry-style React structure.

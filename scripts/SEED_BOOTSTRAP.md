@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Anshul Negi | https://github.com/NegiCoder -->
+
 # Azure SQL Seed Bootstrap
 
 The `scripts/seed-azure-bulk.sh` script populates a fully-empty Azure SQL DB

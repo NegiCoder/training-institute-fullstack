@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Anshul Negi | https://github.com/NegiCoder -->
+
 # ExcelGens — Training Institute Management Platform
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://training-institute-frontend-alpha.vercel.app)

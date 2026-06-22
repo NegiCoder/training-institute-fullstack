@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 Anshul Negi
+ * GitHub: https://github.com/NegiCoder
+ * Unauthorized copying, modification, or distribution of this file
+ * without explicit permission is prohibited.
+ */
+
 import axios from 'axios'
 import { env } from '@/config/env'
 import { useAuthStore } from '@/store/authStore'

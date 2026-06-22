@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Anshul Negi
+# GitHub: https://github.com/NegiCoder
+# Unauthorized copying, modification, or distribution of this file
+# without explicit permission is prohibited.
+
 # =============================================================================
 # ExcelGens - BULK API Seed Script (Azure / any environment)
 # =============================================================================
